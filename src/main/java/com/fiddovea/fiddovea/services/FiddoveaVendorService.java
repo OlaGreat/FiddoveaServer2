@@ -6,11 +6,9 @@ import com.fiddovea.fiddovea.data.repository.ProductRepository;
 import com.fiddovea.fiddovea.data.repository.VendorRepository;
 import com.fiddovea.fiddovea.dto.request.LoginRequest;
 import com.fiddovea.fiddovea.dto.request.ProductRequest;
+import com.fiddovea.fiddovea.dto.request.SendMessageRequest;
 import com.fiddovea.fiddovea.dto.request.VendorRegistrationRequest;
-import com.fiddovea.fiddovea.dto.response.DeleteProductResponse;
-import com.fiddovea.fiddovea.dto.response.LoginResponse;
-import com.fiddovea.fiddovea.dto.response.ProductResponse;
-import com.fiddovea.fiddovea.dto.response.VendorRegistrationResponse;
+import com.fiddovea.fiddovea.dto.response.*;
 import com.fiddovea.fiddovea.exceptions.BadCredentialsException;
 import com.fiddovea.fiddovea.exceptions.FiddoveaException;
 import com.fiddovea.fiddovea.exceptions.UserNotFoundException;
@@ -34,6 +32,8 @@ public class FiddoveaVendorService implements VendorService {
     private final VendorRepository vendorRepository;
     private final ProductService productService;
     private final AdminService adminService;
+
+    private final ChatService chatService;
 
     @Override
     public VendorRegistrationResponse register(VendorRegistrationRequest request) {
@@ -95,7 +95,6 @@ public class FiddoveaVendorService implements VendorService {
         Vendor foundVendor = findVendorById(vendorId);
 
         List<Product> productList = foundVendor.getProductList();
-        log.info("------------------------>>>" + productList.get(0));
         productList.removeIf(foundProduct -> foundProduct.getProductId().equals(productId));
         productService.deleteProduct(productId);
 
@@ -118,6 +117,16 @@ public class FiddoveaVendorService implements VendorService {
     public List<Product> viewOrder(String vendorId) {
         Vendor foundVendor = findVendorById(vendorId);
         return foundVendor.getOrders();
+    }
+
+    @Override
+    public Chat chatCustomerCare(String senderId) {
+        return chatService.chatCustomerCare(senderId);
+    }
+
+    @Override
+    public MessageResponse message(SendMessageRequest sendMessageRequest, String chatId) {
+        return chatService.message(sendMessageRequest, chatId);
     }
 
 

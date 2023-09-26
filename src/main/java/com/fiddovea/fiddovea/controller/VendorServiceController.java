@@ -35,25 +35,25 @@ public class VendorServiceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(loginResponse);
     }
 
-    @PostMapping("/addproduct")
-    public ResponseEntity<ProductResponse> addProduct(@RequestBody ProductRequest productRequest, @RequestParam String vendorId){
+    @PostMapping("/addproduct/{vendorId}")
+    public ResponseEntity<ProductResponse> addProduct(@ModelAttribute ProductRequest productRequest, @PathVariable String vendorId){
         ProductResponse addProductResponse = vendorService.addProduct(productRequest, vendorId);
         return ResponseEntity.status(HttpStatus.OK).body(addProductResponse);
 
     }
 
-    @DeleteMapping("/deleteproduct{vendorId}{productId}")
+    @DeleteMapping("/deleteproduct/{vendorId}{productId}")
     public ResponseEntity<DeleteProductResponse> deleteProduct(@PathVariable String vendorId, @PathVariable String productId){
         DeleteProductResponse response = vendorService.deleteProduct(vendorId, productId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/viewproduct{vendorId}")
+    @GetMapping("/viewproduct/{vendorId}")
     public ResponseEntity<List<Product>> viewProductList(@PathVariable String vendorId){
         List<Product> myProducts = vendorService.viewMyProduct(vendorId);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(myProducts);
     }
-    @GetMapping("/myorder{vendorId}")
+    @GetMapping("/myorder/{vendorId}")
     public ResponseEntity<List<Product>> viewMyOrder(@PathVariable String vendorId){
         List<Product> myOrders = vendorService.viewOrder(vendorId);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(myOrders);
