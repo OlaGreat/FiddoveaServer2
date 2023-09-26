@@ -1,26 +1,37 @@
 package com.fiddovea.fiddovea.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.fiddovea.fiddovea.appUtils.AppUtils;
 import com.fiddovea.fiddovea.data.models.*;
 import com.fiddovea.fiddovea.data.repository.ProductRepository;
 import com.fiddovea.fiddovea.data.repository.VendorRepository;
 import com.fiddovea.fiddovea.dto.request.LoginRequest;
 import com.fiddovea.fiddovea.dto.request.ProductRequest;
+import com.fiddovea.fiddovea.dto.request.UpdateVendorRequest;
 import com.fiddovea.fiddovea.dto.request.VendorRegistrationRequest;
-import com.fiddovea.fiddovea.dto.response.DeleteProductResponse;
-import com.fiddovea.fiddovea.dto.response.LoginResponse;
-import com.fiddovea.fiddovea.dto.response.ProductResponse;
-import com.fiddovea.fiddovea.dto.response.VendorRegistrationResponse;
+import com.fiddovea.fiddovea.dto.response.*;
 import com.fiddovea.fiddovea.exceptions.BadCredentialsException;
 import com.fiddovea.fiddovea.exceptions.FiddoveaException;
 import com.fiddovea.fiddovea.exceptions.UserNotFoundException;
+import com.github.fge.jackson.jsonpointer.JsonPointer;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
+import com.github.fge.jsonpatch.JsonPatchOperation;
+import com.github.fge.jsonpatch.ReplaceOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.fiddovea.fiddovea.appUtils.AppUtils.JSON_PATCH_PATH_PREFIX;
 import static com.fiddovea.fiddovea.appUtils.AppUtils.PRODUCT_ADD_MESSAGE;
 import static com.fiddovea.fiddovea.data.models.Role.VENDOR;
 import static com.fiddovea.fiddovea.dto.response.ResponseMessage.*;
@@ -73,6 +84,117 @@ public class FiddoveaVendorService implements VendorService {
 
         return verifyLoginDetails(email, password);
     }
+
+    @Override
+    public GetResponse getVendorById(String id){
+        Optional<Vendor> foundVendor = vendorRepository.findById(id);
+        Vendor vendor = foundVendor.orElseThrow(
+                ()-> new UserNotFoundException(USER_NOT_FOUND.getMessage())
+        );
+
+        return buildVendorResponse(vendor);
+    }
+
+
+    private GetResponse buildVendorResponse(Vendor savedVendor) {
+        return GetResponse.builder()
+                .fullName(getVendorFullName(savedVendor))
+                .phoneNumber(savedVendor.getPhoneNumber())
+                .email(savedVendor.getEmail())
+                .build();
+    }
+    private static String getVendorFullName(Vendor savedVendor){
+        var fullName = new StringBuilder();
+
+        if (savedVendor.getFirstName() != null){
+            fullName.append(savedVendor.getFirstName());
+        }
+        if (savedVendor.getLastName() != null){
+            if (fullName.length() > 0){
+                fullName.append(" ");
+            }
+            fullName.append(savedVendor.getLastName());
+        }
+        return fullName.toString();
+    }
+
+
+    @Override
+    public UpdateVendorResponse updateProfile(UpdateVendorRequest updateVendorRequest, String id) throws JsonPatchException {
+        Vendor vendor = findVendorById(id);
+        ModelMapper modelMapper = new ModelMapper();
+        JsonPatch updatePatch = buildUpdatePatch(updateVendorRequest);
+        log.info("patch-->{}", updatePatch);
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        JsonNode vendorNode = objectMapper.convertValue(vendor, JsonNode.class);
+        log.info("node--->{}", vendorNode);
+        JsonNode updatedNode = updatePatch.apply(vendorNode);
+        Vendor updatedCustomer = objectMapper.convertValue(updatedNode, Vendor.class);
+
+        vendorRepository.save(updatedCustomer);
+
+        modelMapper.map(updateVendorRequest, vendor);
+
+        JsonPatch updatedPatch = buildUpdatePatch(updateVendorRequest);
+        return applyPatch(updatedPatch, vendor);
+    }
+
+
+    private JsonPatch buildUpdatePatch(UpdateVendorRequest updateVendorRequest) {
+        Field[] fields = updateVendorRequest.getClass().getDeclaredFields();
+        List<ReplaceOperation> operations = Arrays.stream(fields)
+                .filter(field -> {
+//                    System.out.println(field);
+                    return validateField(updateVendorRequest, field);
+                })
+                .map(field -> buildReplaceOperation(updateVendorRequest, field))
+                .toList();
+        List<JsonPatchOperation> patchOperations = new ArrayList<>(operations);
+        return new JsonPatch(patchOperations);
+    }
+
+    private ReplaceOperation buildReplaceOperation(UpdateVendorRequest updateVendorRequest, Field field) {
+        field.setAccessible(true);
+        try {
+            String path = JSON_PATCH_PATH_PREFIX + field.getName();
+            JsonPointer pointer = new JsonPointer(path);
+            var value = field.get(updateVendorRequest);
+            TextNode node = new TextNode(value.toString());
+            return new ReplaceOperation(pointer, node);
+        } catch (Exception exception) {
+            throw new FiddoveaException(exception.getMessage());
+        }
+    }
+
+    private boolean validateField(UpdateVendorRequest updateVendorRequest, Field field) {
+        List<String> excludedFields = List.of("companyAddress");
+        field.setAccessible(true);
+        try {
+            return field.get(updateVendorRequest) != null && !excludedFields.contains(field.getName());
+        } catch (IllegalAccessException e) {
+            throw new FiddoveaException(e.getMessage());
+        }
+    }
+
+
+    private UpdateVendorResponse applyPatch(JsonPatch updatePatch, Vendor vendor) throws JsonPatchException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        //1. Convert user to JsonNode
+        JsonNode vendorNode = objectMapper.convertValue(vendor, JsonNode.class);
+
+        //2. Apply patch to JsonNode from step 1
+        JsonNode updatedNode = updatePatch.apply(vendorNode);
+        //3. Convert updatedNode to user
+        vendor = objectMapper.convertValue(updatedNode, Vendor.class);
+//        log.info("user-->{}", vendor);
+        //4. Save updatedUser from step 3 in the DB
+        var savedUser= vendorRepository.save(vendor);
+        log.info("user-->{}", savedUser);
+        return new UpdateVendorResponse(PROFILE_UPDATE_SUCCESSFUL.name());
+
+    }
+
 
     @Override
     public ProductResponse addProduct(ProductRequest productRequest, String vendorId) {
