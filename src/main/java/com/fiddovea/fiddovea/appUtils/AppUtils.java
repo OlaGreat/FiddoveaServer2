@@ -8,6 +8,9 @@ public class AppUtils {
     public static final String APP_NAME = "Fiddovea";
     public static final String APP_MAIL_SENDER = "Oladipupoolamilekan2@gmail.com";
     public static final String PRODUCT_ADD_MESSAGE = "Product added successfully";
+    public static final String JSON_PATCH_PATH_PREFIX = "/";
+
+    public static final String BLANK_SPACE = " ";
     public static final String  IMAGE_LOCATION_PATH = "C:\\Users\\DELL\\Documents\\ProjectWorks\\Fiddovea\\FiddoveaServer\\Fiddovea\\src\\test\\resources\\image\\jerry.jpg";
 
     public static boolean verifyEmail(String email){
