@@ -120,9 +120,7 @@ public class FiddoveaVendorServiceTest {
         productRequest.setProductPrice(BigDecimal.valueOf(500));
         productRequest.setProductQuantity(10);
         productRequest.setDiscount(0);
-
-        MultipartFile newImage = getTestImage();
-        productRequest.setProductImage(newImage.getBytes());
+        productRequest.setProductImage(getTestImage());
 
 
         ProductResponse response = vendorService.addProduct(productRequest, "6511c40f29b0ca3c8d0cce62");
@@ -131,7 +129,7 @@ public class FiddoveaVendorServiceTest {
     }
 
     private MultipartFile getTestImage(){
-        Path path = Paths.get("C:\\Users\\DELL\\Documents\\ProjectWorks\\Fiddovea\\FiddoveaServer\\Fiddovea\\src\\test\\resources\\image\\jerry.jpg");
+        Path path = Paths.get("C:\\Users\\DELL\\Documents\\ProjectWorks\\Fiddovea\\FiddoveaServer\\Fiddovea\\src\\test\\resources\\image\\STK160_X_Twitter_009.webp");
         try (var inputStream = Files.newInputStream(path)){
             MultipartFile image = new MockMultipartFile("new_image",inputStream);
             return image;

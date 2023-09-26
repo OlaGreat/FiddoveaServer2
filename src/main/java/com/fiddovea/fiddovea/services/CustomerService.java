@@ -1,5 +1,6 @@
 package com.fiddovea.fiddovea.services;
 
+import com.fiddovea.fiddovea.data.models.Chat;
 import com.fiddovea.fiddovea.data.models.Product;
 import com.fiddovea.fiddovea.dto.request.*;
 import com.fiddovea.fiddovea.dto.response.*;
@@ -21,6 +22,8 @@ public interface CustomerService {
 //    List<Product> filterByPrice();
 
     ProductReviewResponse reviewProduct(ProductReviewRequest productReviewRequest, String customerId);
+    Chat chatCustomerCare(String senderId);
+    MessageResponse message(SendMessageRequest sendMessageRequest, String chatId);
 
 
 

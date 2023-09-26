@@ -1,10 +1,7 @@
 package com.fiddovea.fiddovea.services;
 
 import com.fiddovea.fiddovea.appUtils.AppUtils;
-import com.fiddovea.fiddovea.data.models.Cart;
-import com.fiddovea.fiddovea.data.models.Customer;
-import com.fiddovea.fiddovea.data.models.Product;
-import com.fiddovea.fiddovea.data.models.Review;
+import com.fiddovea.fiddovea.data.models.*;
 import com.fiddovea.fiddovea.data.repository.CustomerRepository;
 import com.fiddovea.fiddovea.dto.request.*;
 import com.fiddovea.fiddovea.dto.response.*;
@@ -30,6 +27,7 @@ public class FiddoveaCustomerService implements CustomerService {
     private final MailService mailService;
     private final ProductService productService;
     private final TokenService tokenService;
+    private final ChatService chatService;
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
@@ -189,6 +187,15 @@ public class FiddoveaCustomerService implements CustomerService {
         return null;
     }
 
+    @Override
+    public Chat chatCustomerCare(String senderId) {
+        return chatService.chatCustomerCare(senderId);
+    }
+
+    @Override
+    public MessageResponse message(SendMessageRequest sendMessageRequest, String chatId) {
+        return chatService.message(sendMessageRequest, chatId);
+    }
 
 
 //    @Override
