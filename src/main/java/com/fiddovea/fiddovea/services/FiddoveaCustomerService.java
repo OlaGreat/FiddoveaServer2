@@ -1,21 +1,37 @@
 package com.fiddovea.fiddovea.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.fiddovea.fiddovea.appUtils.AppUtils;
 import com.fiddovea.fiddovea.data.models.*;
 import com.fiddovea.fiddovea.data.repository.CustomerRepository;
 import com.fiddovea.fiddovea.dto.request.*;
 import com.fiddovea.fiddovea.dto.response.*;
 import com.fiddovea.fiddovea.exceptions.BadCredentialsException;
+import com.fiddovea.fiddovea.exceptions.FiddoveaException;
 import com.fiddovea.fiddovea.exceptions.ProductAlreadyAdded;
 import com.fiddovea.fiddovea.exceptions.UserNotFoundException;
+import com.github.fge.jackson.jsonpointer.JsonPointer;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
+import com.github.fge.jsonpatch.JsonPatchOperation;
+import com.github.fge.jsonpatch.ReplaceOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
+import static com.fiddovea.fiddovea.appUtils.AppUtils.JSON_PATCH_PATH_PREFIX;
 import static com.fiddovea.fiddovea.data.models.Role.CUSTOMER;
 import static com.fiddovea.fiddovea.dto.response.ResponseMessage.*;
+import static com.fiddovea.fiddovea.dto.response.ResponseMessage.PROFILE_UPDATE_SUCCESSFUL;
 import static com.fiddovea.fiddovea.exceptions.ExceptionMessages.*;
 
 @Slf4j
@@ -52,6 +68,122 @@ public class FiddoveaCustomerService implements CustomerService {
 
         return verifyLoginDetails(email, password);
     }
+
+    @Override
+    public GetResponse getCustomerById(String id)throws UserNotFoundException {
+        Optional<Customer> foundCustomer = customerRepository.findById(id);
+        Customer customer = foundCustomer.orElseThrow(
+                ()->new UserNotFoundException(USER_NOT_FOUND.getMessage())
+        );
+        return buildUserResponse(customer);
+    }
+
+
+    private static GetResponse buildUserResponse(Customer savedCustomer) {
+        Address address = savedCustomer.getAddress();
+        String addressString = (address != null) ? address.toString() : "";
+
+        return GetResponse.builder()
+                .fullName(getFullName(savedCustomer))
+                .lga(addressString)
+                .houseNumber(addressString)
+                .build();
+    }
+
+
+    private static String getFullName(Customer savedCustomer) {
+        StringBuilder fullNameBuilder = new StringBuilder();
+
+        if (savedCustomer.getFirstName() != null) {
+            fullNameBuilder.append(savedCustomer.getFirstName());
+        }
+
+        if (savedCustomer.getLastName() != null) {
+            if (fullNameBuilder.length() > 0) {
+                fullNameBuilder.append(" ");
+            }
+            fullNameBuilder.append(savedCustomer.getLastName());
+        }
+        return fullNameBuilder.toString();
+    }
+
+
+
+    public UpdateCustomerResponse updateProfile(UpdateCustomerRequest updateCustomerRequest, String userId) throws JsonPatchException {
+        Customer customer = findById(userId);
+        ModelMapper modelMapper = new ModelMapper();
+        JsonPatch updatePatch = buildUpdatePatch(updateCustomerRequest);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode customerNode = objectMapper.convertValue(customer, JsonNode.class);
+        JsonNode updatedNode = updatePatch.apply(customerNode);
+        Customer updatedCustomer = objectMapper.convertValue(updatedNode, Customer.class);
+
+//        Address userAddress = customer.getAddress();
+//        modelMapper.map(updateCustomerRequest, userAddress);
+//        customer.setAddress(userAddress);
+        customerRepository.save(updatedCustomer);
+        modelMapper.map(updateCustomerRequest, customer);
+
+        JsonPatch updatedPatch = buildUpdatePatch(updateCustomerRequest);
+        return applyPatch(updatedPatch, customer);
+    }
+
+
+    private JsonPatch buildUpdatePatch(UpdateCustomerRequest updateCustomerRequest) {
+        Field[] fields = updateCustomerRequest.getClass().getDeclaredFields();
+        List<ReplaceOperation> operations = Arrays.stream(fields)
+                .filter(field -> validateField(updateCustomerRequest, field))
+                .map(field -> buildReplaceOperation(updateCustomerRequest, field))
+                .toList();
+        List<JsonPatchOperation> patchOperations = new ArrayList<>(operations);
+        return new JsonPatch(patchOperations);
+    }
+
+
+    private boolean validateField(UpdateCustomerRequest updateCustomerRequest, Field field) {
+        List<String> excludedFields = List.of("gender", "houseNumber", "lga", "street", "state");
+        field.setAccessible(true);
+
+        try {
+            return field.get(updateCustomerRequest) != null && !excludedFields.contains(field.getName());
+        } catch (IllegalAccessException e) {
+            throw new FiddoveaException(e.getMessage());
+        }
+    }
+
+    private ReplaceOperation buildReplaceOperation(UpdateCustomerRequest updateCustomerRequest, Field field) {
+        field.setAccessible(true);
+        try {
+            String path = JSON_PATCH_PATH_PREFIX + field.getName();
+            JsonPointer pointer = new JsonPointer(path);
+            var value = field.get(updateCustomerRequest);
+            TextNode node = new TextNode(value.toString());
+            return new ReplaceOperation(pointer, node);
+        } catch (Exception exception) {
+            throw new FiddoveaException(exception.getMessage());
+        }
+    }
+
+
+    private UpdateCustomerResponse applyPatch(JsonPatch updatePatch, Customer customer) throws JsonPatchException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        //1. Convert user to JsonNode
+        JsonNode userNode = objectMapper.convertValue(customer, JsonNode.class);
+
+        //2. Apply patch to JsonNode from step 1
+        JsonNode updatedNode = updatePatch.apply(userNode);
+        //3. Convert updatedNode to user
+        customer = objectMapper.convertValue(updatedNode, Customer.class);
+        log.info("user-->{}", customer);
+        //4. Save updatedUser from step 3 in the DB
+        var savedUser= customerRepository.save(customer);
+        log.info("user-->{}", savedUser);
+        return new UpdateCustomerResponse(PROFILE_UPDATE_SUCCESSFUL.name());
+
+    }
+
+
 
     private LoginResponse verifyLoginDetails(String email, String password) {
         Customer customer = customerRepository.findByEmail(email);
@@ -205,8 +337,8 @@ public class FiddoveaCustomerService implements CustomerService {
 //        return null;
 //    }
 
-
-    private Customer findById(String customerId) {
+    @Override
+    public Customer findById(String customerId) {
         Customer foundCustomer = customerRepository.findById(customerId)
                 .orElseThrow(()-> new UserNotFoundException(USER_NOT_FOUND.getMessage()));
         return foundCustomer;
