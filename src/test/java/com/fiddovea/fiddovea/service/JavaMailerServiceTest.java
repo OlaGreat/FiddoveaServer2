@@ -14,7 +14,7 @@ public class JavaMailerServiceTest {
     @Test
     public void testJavaMailerSender(){
         JavaMailerRequest request = new JavaMailerRequest();
-        request.setTo("dominicrotimi@gmail.com");
+        request.setTo("coutinhodacruz10@gmail.com");
         request.setMessage("How are you");
         request.setSubject("Testing");
         mailService.send(request);
