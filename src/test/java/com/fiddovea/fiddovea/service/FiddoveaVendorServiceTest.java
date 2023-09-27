@@ -1,6 +1,5 @@
 package com.fiddovea.fiddovea.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fiddovea.fiddovea.data.models.Product;
 import com.fiddovea.fiddovea.dto.request.LoginRequest;
 import com.fiddovea.fiddovea.dto.request.ProductRequest;
@@ -169,9 +168,7 @@ public class FiddoveaVendorServiceTest {
         productRequest.setProductPrice(BigDecimal.valueOf(500));
         productRequest.setProductQuantity(10);
         productRequest.setDiscount(0);
-
-        MultipartFile newImage = getTestImage();
-        productRequest.setProductImage(newImage.getBytes());
+        productRequest.setProductImage(getTestImage());
 
         sendNotificationToVendor("651258570a29fe6b94f9d353", YOUR_PRODUCT_HAS_BEEN_ADDED_SUCCESSFULLY.name());
 
@@ -199,7 +196,8 @@ public class FiddoveaVendorServiceTest {
     }
 
     private MultipartFile getTestImage(){
-        Path path = Paths.get("C:\\Users\\Admin\\FiddoveaServer2\\src\\test\\resources\\image\\jerry.jpg");
+        Path path = Paths.get("C:\\Users\\DELL\\Documents\\ProjectWorks\\Fiddovea\\FiddoveaServer\\Fiddovea\\src\\test\\resources\\image\\STK160_X_Twitter_009.webp");
+
         try (var inputStream = Files.newInputStream(path)){
             MultipartFile image = new MockMultipartFile("new_image",inputStream);
             return image;

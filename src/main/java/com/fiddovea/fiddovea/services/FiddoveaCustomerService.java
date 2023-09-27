@@ -44,6 +44,7 @@ public class FiddoveaCustomerService implements CustomerService {
     private final MailService mailService;
     private final ProductService productService;
     private final TokenService tokenService;
+    private final ChatService chatService;
 
     private final NotificationService notificationService;
 
@@ -243,7 +244,7 @@ public class FiddoveaCustomerService implements CustomerService {
 
     private void sendNotificationToCustomer(Customer customer, Product product) {
         Notification notification = new Notification();
-        String message = product.getProductName()+ YOU_HAVE_THE_PRODUCT_TO_YOUR_WISHLIST.name();
+        String message = product.getProductName()+ YOU_ADD_THE_PRODUCT_TO_YOUR_WISHLIST.name();
 //        notification.setMessage( );
         notification.setTimestamp(LocalDateTime.now());
         notification.setUserId(customer.getId());
@@ -336,6 +337,15 @@ public class FiddoveaCustomerService implements CustomerService {
         return null;
     }
 
+    @Override
+    public Chat chatCustomerCare(String senderId) {
+        return chatService.chatCustomerCare(senderId);
+    }
+
+    @Override
+    public MessageResponse message(SendMessageRequest sendMessageRequest, String chatId) {
+        return chatService.message(sendMessageRequest, chatId);
+    }
 
 
 //    @Override

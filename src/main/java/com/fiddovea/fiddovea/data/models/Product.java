@@ -23,5 +23,5 @@ public class Product {
     private List<Review> productReviews;
     private int productQuantity;
     private String vendorId;
-    private byte[] productImage;
+    private String productImageUrl;
 }

@@ -28,7 +28,7 @@ public class Order {
     public String setCreatedAt(){
         LocalDateTime localDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyy HH:mm:ss");
-       return createdAt = localDateTime.format(formatter);
+   return createdAt = localDateTime.format(formatter);
     }
 
 }
