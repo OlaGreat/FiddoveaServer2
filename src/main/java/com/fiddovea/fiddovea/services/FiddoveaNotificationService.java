@@ -8,7 +8,8 @@ import com.fiddovea.fiddovea.dto.response.NotificationResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.fiddovea.fiddovea.dto.response.ResponseMessage.NOTIFICATION_SENT_SUCCESSFULLY;
 
@@ -16,28 +17,20 @@ import static com.fiddovea.fiddovea.dto.response.ResponseMessage.NOTIFICATION_SE
 @AllArgsConstructor
 public class FiddoveaNotificationService implements NotificationService{
 
-    private final CustomerService userService;
     private final NotificationRepository notificationRepository;
 
 
     @Override
-    public NotificationResponse sendNotification(NotificationRequest notificationRequest) {
-        String  sender_id = notificationRequest.getSender_id();
-        String receivers_id = notificationRequest.getRecipients_id();
-        String header = notificationRequest.getSubject();
+    public List<Notification> getNotificationsByUserId(String userId) {
+        return notificationRepository.findByUserId(userId);
+    }
 
+    @Override
+    public void addNotification(String userId, String message) {
         Notification notification = new Notification();
-        notification.setSender(sender_id);
-
-        Customer foundUser = userService.findById(receivers_id);
-        notification.setCustomer(foundUser);
-
-        notification.setContent(header);
-
+        notification.setMessage(message);
+        notification.setTimestamp(LocalDateTime.now());
+        notification.setUserId(userId);
         notificationRepository.save(notification);
-
-        return NotificationResponse.builder()
-                .message(NOTIFICATION_SENT_SUCCESSFULLY.name())
-                .build();
     }
 }
