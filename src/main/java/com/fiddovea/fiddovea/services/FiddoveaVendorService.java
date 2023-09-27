@@ -22,6 +22,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +43,11 @@ public class FiddoveaVendorService implements VendorService {
     private final ProductService productService;
     private final AdminService adminService;
 
+
+    private final NotificationService notificationService;
+
     private final ChatService chatService;
+
 
     @Override
     public VendorRegistrationResponse register(VendorRegistrationRequest request) {
@@ -202,12 +207,27 @@ public class FiddoveaVendorService implements VendorService {
         Product savedProduct = productService.addNewProduct(productRequest, vendorId);
 
         vendor.getProductList().add(savedProduct);
+
+        sendNotificationToVendor(vendor, savedProduct);
         vendorRepository.save(vendor);
 
         ProductResponse productResponse = new ProductResponse();
         productResponse.setMessage(PRODUCT_ADD_MESSAGE);
         return productResponse;
     }
+
+
+    private void sendNotificationToVendor(Vendor vendor, Product product) {
+
+        Notification notification = new Notification();
+        String message = "Your product '" + product.getProductName() + "' has been added successfully.";
+//        notification.setMessage();
+        notification.setTimestamp(LocalDateTime.now());
+        notification.setUserId(vendor.getId());
+
+        notificationService.addNotification(product.getProductId(), message);
+    }
+
 
     @Override
     public DeleteProductResponse deleteProduct(String vendorId, String productId) {
