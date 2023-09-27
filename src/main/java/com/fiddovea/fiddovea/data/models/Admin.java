@@ -15,5 +15,6 @@ public class Admin  extends User{
     @Id
     private String id;
     List<Vendor> toVerify;
+    private Notification notification;
 
 }

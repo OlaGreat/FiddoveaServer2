@@ -8,11 +8,11 @@ import lombok.Setter;
 @Getter
 public class NotificationRequest {
 
-    private String  sender_id;
+    private String message;
 
-    @JsonProperty("to")
-    private String recipients_id;
-
-    @JsonProperty("htmlContent")
-    private String subject;
+//    @JsonProperty("to")
+//    private String recipients_id;
+//
+//    @JsonProperty("htmlContent")
+//    private String subject;
 }

@@ -1,14 +1,10 @@
 package com.fiddovea.fiddovea.controller;
 
 import com.fiddovea.fiddovea.data.models.Product;
-import com.fiddovea.fiddovea.dto.request.LoginRequest;
-import com.fiddovea.fiddovea.dto.request.ProductRequest;
-import com.fiddovea.fiddovea.dto.request.VendorRegistrationRequest;
-import com.fiddovea.fiddovea.dto.response.DeleteProductResponse;
-import com.fiddovea.fiddovea.dto.response.LoginResponse;
-import com.fiddovea.fiddovea.dto.response.ProductResponse;
-import com.fiddovea.fiddovea.dto.response.VendorRegistrationResponse;
+import com.fiddovea.fiddovea.dto.request.*;
+import com.fiddovea.fiddovea.dto.response.*;
 import com.fiddovea.fiddovea.services.VendorService;
+import com.github.fge.jsonpatch.JsonPatchException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +29,13 @@ public class VendorServiceController {
     public ResponseEntity<LoginResponse> loginCustomer(@RequestBody LoginRequest loginRequest){
         LoginResponse loginResponse = vendorService.login(loginRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(loginResponse);
+    }
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UpdateVendorResponse>updateUserProfile(@ModelAttribute UpdateVendorRequest updaterVendorRequest, @PathVariable String id) throws JsonPatchException {
+        UpdateVendorResponse response = vendorService.updateProfile(updaterVendorRequest, id);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/addproduct/{vendorId}")
