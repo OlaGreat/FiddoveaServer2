@@ -22,4 +22,5 @@ public class Vendor extends User{
     private List<Product> productList = new ArrayList<>();
     private List<Product> orders = new ArrayList<>();
     private boolean isActive;
+    private Notification notification;
 }

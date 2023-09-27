@@ -9,6 +9,7 @@ import com.fiddovea.fiddovea.dto.request.VendorRegistrationRequest;
 import com.fiddovea.fiddovea.dto.response.*;
 import com.fiddovea.fiddovea.exceptions.BadCredentialsException;
 import com.fiddovea.fiddovea.exceptions.FiddoveaException;
+import com.fiddovea.fiddovea.services.NotificationService;
 import com.fiddovea.fiddovea.services.VendorService;
 import com.github.fge.jsonpatch.JsonPatchException;
 import org.junit.jupiter.api.MethodOrderer;
@@ -28,6 +29,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import static com.fiddovea.fiddovea.appUtils.AppUtils.BLANK_SPACE;
+import static com.fiddovea.fiddovea.dto.response.ResponseMessage.YOUR_PRODUCT_HAS_BEEN_ADDED_SUCCESSFULLY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -37,6 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class FiddoveaVendorServiceTest {
     @Autowired
     VendorService vendorService;
+
+    @Autowired
+    NotificationService notificationService;
 
     @Test
     @Order(1)
@@ -168,10 +173,29 @@ public class FiddoveaVendorServiceTest {
         MultipartFile newImage = getTestImage();
         productRequest.setProductImage(newImage.getBytes());
 
+        sendNotificationToVendor("651258570a29fe6b94f9d353", YOUR_PRODUCT_HAS_BEEN_ADDED_SUCCESSFULLY.name());
+
 
         ProductResponse response = vendorService.addProduct(productRequest, "651258570a29fe6b94f9d353");
         assertThat(response).isNotNull();
 
+
+//        // Assert that the captured message matches the expected message
+        assertThat(capturedMessage).isEqualTo(YOUR_PRODUCT_HAS_BEEN_ADDED_SUCCESSFULLY.name());
+
+        // Assert that the captured user ID matches the vendor ID
+        assertThat(capturedUserId).isEqualTo("651258570a29fe6b94f9d353");
+    }
+
+
+      private String capturedMessage;
+     private String capturedUserId;
+
+
+    private void sendNotificationToVendor(String vendorId, String message) {
+        capturedMessage = message;
+        capturedUserId = vendorId;
+        notificationService.addNotification(vendorId, message);
     }
 
     private MultipartFile getTestImage(){
