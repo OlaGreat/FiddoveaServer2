@@ -2,10 +2,13 @@ package com.fiddovea.fiddovea.services;
 
 import com.fiddovea.fiddovea.data.models.Token;
 import com.fiddovea.fiddovea.data.repository.TokenRepository;
+import com.fiddovea.fiddovea.exceptions.TokenExpiredException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
+
+import static com.fiddovea.fiddovea.exceptions.ExceptionMessages.TOKEN_EXPIRED_PLEASE_GENERATE_ANOTHER_TOKEN_FOR_VERIFICATION;
 
 
 @Service
@@ -17,21 +20,33 @@ public class FiddoveaTokenService implements TokenService{
 
 
     @Override
-    public String createToken(String userId) {
+    public String createToken(String userEmail) {
         String token = generateToken();
         Token userToken = new Token();
         userToken.setToken(token);
-        userToken.setOwnerId(userId);
+        userToken.setOwnerEmail(userEmail);
         Token savedToken = tokenRepository.save(userToken);
+        System.out.println(savedToken);
 
         String tokenToSend = savedToken.getToken();
 
         return tokenToSend;
     }
 
+    @Override
+    public Token findByOwnerEmail(String email) {
+        Token token = tokenRepository.findByownerEmail(email).orElseThrow(()-> new TokenExpiredException(TOKEN_EXPIRED_PLEASE_GENERATE_ANOTHER_TOKEN_FOR_VERIFICATION.getMessage()));
+        return token;
+    }
+
+    @Override
+    public void deleteToken(String id) {
+        tokenRepository.deleteById(id);
+    }
+
     private String generateToken() {
         StringBuilder otp = new StringBuilder();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 5; i++) {
             Random random = new Random();
             int digit = random.nextInt(1,9);
             otp.append(digit);
