@@ -1,5 +1,6 @@
 package com.fiddovea.fiddovea.data.models;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Setter
 @Getter
+@Builder
 @Document("orders")
 public class Order {
     @Id
