@@ -74,5 +74,10 @@ public class FiddoveaProductService implements ProductService{
     public void deleteProduct(String productId) {
         productRepository.deleteById(productId);
     }
+
+    @Override
+    public void saveProduct(Product product) {
+        productRepository.save(product);
+    }
 }
 
