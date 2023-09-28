@@ -166,7 +166,7 @@ public class FiddoveaVendorServiceTest {
         productRequest.setProductImage(getTestImage());
 
 
-        ProductResponse response = vendorService.addProduct(productRequest, "651258570a29fe6b94f9d353");
+        ProductResponse response = vendorService.addProduct(productRequest, "6511c40f29b0ca3c8d0cce62");
         assertThat(response).isNotNull();
 
     }

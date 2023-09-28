@@ -12,4 +12,7 @@ public interface ProductService {
     List<Product> findProductByName(String productName);
     Product findById(String id);
     void deleteProduct(String productId);
+
+    void saveProduct(Product product);
+
 }

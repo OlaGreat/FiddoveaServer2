@@ -8,6 +8,7 @@ public class AppUtils {
     public static final String APP_NAME = "Fiddovea";
     public static final String APP_MAIL_SENDER = "Oladipupoolamilekan2@gmail.com";
     public static final String PRODUCT_ADD_MESSAGE = "Product added successfully";
+    public static final String otpSubject = "FIDDOVEA_VERIFICATION_OTP";
     public static final String JSON_PATCH_PATH_PREFIX = "/";
 
     public static final String BLANK_SPACE = " ";

@@ -32,9 +32,14 @@ public interface CustomerService {
     RemoveProductResponse removeFromWishList(RemoveProductRequest request);
 //    List<Product> filterByPrice();
 
-    ProductReviewResponse reviewProduct(ProductReviewRequest productReviewRequest, String customerId);
+    ProductReviewResponse reviewProduct(ProductReviewRequest productReviewRequest);
     Chat chatCustomerCare(String senderId);
     MessageResponse message(SendMessageRequest sendMessageRequest, String chatId);
+
+    TokenVerificationResponse verifyToken(String email, String token);
+
+
+
 
 
 
