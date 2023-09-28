@@ -87,10 +87,16 @@ public class CustomerServiceController {
         return ResponseEntity.status(HttpStatus.OK).body(productSearch);
     }
 
-    @PostMapping("/verifyotp")
+    @PostMapping("/verifytoken")
     public ResponseEntity<TokenVerificationResponse> verifyToken(String email, String token){
         TokenVerificationResponse response = customerService.verifyToken(email,token);
         return  ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/viewcart/{customerId}")
+    public ResponseEntity<List<Product>> viewCart(@PathVariable String customerId){
+        List<Product> cart = customerService.viewCart(customerId);
+        return ResponseEntity.status(HttpStatus.OK).body(cart);
     }
 
 
