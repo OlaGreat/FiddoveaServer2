@@ -23,6 +23,7 @@ public class Product {
     private double discount;
     private List<Review> productReviews = new ArrayList<>();
     private int productQuantity;
+    private ProductType productType;
     private String vendorId;
     private String productImageUrl;
 }

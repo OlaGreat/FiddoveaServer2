@@ -19,4 +19,5 @@ public class ProductRequest {
     private double discount;
     private int productQuantity;
     private MultipartFile productImage;
+    private String productType;
 }
