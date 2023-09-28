@@ -371,6 +371,13 @@ public class FiddoveaCustomerService implements CustomerService {
         return response;
     }
 
+    @Override
+    public List<Product> viewCart(String customerId) {
+       Customer foundCustomer = findById(customerId);
+       List<Product> cart = foundCustomer.getCart().getProducts();
+        return cart;
+    }
+
 
 //    @Override
 //    public List<Product> filterByPrice(double minPrice, double maxPrice) {
