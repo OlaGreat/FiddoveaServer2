@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+
 @Setter
 @Getter
 @Document("notification")
@@ -14,8 +16,9 @@ public class Notification {
     @Id
     private String id;
 
-    private String content;
-    private String sender;
+        private String message;
+        private LocalDateTime timestamp;
+        private String userId;
 
-    private Customer customer;
+
 }

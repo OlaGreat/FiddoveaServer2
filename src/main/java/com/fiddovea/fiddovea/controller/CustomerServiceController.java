@@ -5,6 +5,7 @@ import com.fiddovea.fiddovea.dto.request.*;
 import com.fiddovea.fiddovea.dto.response.*;
 import com.fiddovea.fiddovea.services.CustomerService;
 import com.fiddovea.fiddovea.dto.request.RemoveProductRequest;
+import com.github.fge.jsonpatch.JsonPatchException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,13 @@ public class CustomerServiceController {
     public ResponseEntity<LoginResponse> loginCustomer(@RequestBody LoginRequest loginRequest) {
         LoginResponse loginResponse = customerService.login(loginRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(loginResponse);
+    }
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UpdateCustomerResponse>updateUserProfile(@ModelAttribute UpdateCustomerRequest updaterCustomerRequest, @PathVariable String id) throws JsonPatchException {
+        UpdateCustomerResponse response = customerService.updateProfile(updaterCustomerRequest, id);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/wishlist/{customerId}")
