@@ -213,6 +213,18 @@ public class FiddoveaCustomerServiceTest {
        assertThat(response).isNotNull();
     }
 
+    @Test
+    @Order(16)
+    void testThatCustomerCanMakeOrder(){
+
+    }
+
+    @Test
+    void testThatCustomerCanViewCart(){
+       List<Product> cart = customerService.viewCart("65144107c024b32b4b18104f");
+       assertThat(cart.size()).isEqualTo(0);
+    }
+
 
 //    @Test
 //    public void testFindById(){

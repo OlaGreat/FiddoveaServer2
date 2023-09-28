@@ -38,10 +38,7 @@ public interface CustomerService {
 
     TokenVerificationResponse verifyToken(String email, String token);
 
-
-
-
-
+    List<Product> viewCart(String customerId);
 
 }
 
