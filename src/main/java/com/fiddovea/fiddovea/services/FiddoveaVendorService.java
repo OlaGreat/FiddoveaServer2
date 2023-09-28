@@ -60,7 +60,6 @@ public class FiddoveaVendorService implements VendorService {
         vendor.setBusinessType(BusinessType.valueOf(request.getBusinessType().toUpperCase()));
         vendor.setCompanyPhoneNumber(request.getCompanyPhoneNumber());
         vendor.setCompanyRcNumber(request.getCompanyRcNumber());
-        vendor.setProductType(ProductType.valueOf(request.getProductType().toUpperCase()));
         Address address = new Address();
         address.setLga(request.getLga());
         address.setStreet(request.getStreet());
