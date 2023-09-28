@@ -20,10 +20,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-<<<<<<< HEAD
 import java.time.Duration;
-=======
->>>>>>> 54383a5e8f93c03fa27fdfbce2a73b958b0f7afb
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
