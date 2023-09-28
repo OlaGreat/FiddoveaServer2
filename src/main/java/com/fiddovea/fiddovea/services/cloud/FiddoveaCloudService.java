@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -24,7 +25,7 @@ public class FiddoveaCloudService implements CloudService{
 
         try {
             Map<?,?> response = uploader.upload(file.getBytes(), ObjectUtils.asMap(
-                    "public_id","promiscuous/users/profile images/" + file.getName(),
+                    "public_id","promiscuous/users/profile images/"+ UUID.randomUUID(),
                     "api_key", appConfig.getCloudKey(),
                     "api_secret", appConfig.getCloudSecret(),
                     "cloud_name", appConfig.getCloudName(),

@@ -136,7 +136,6 @@ public class FiddoveaVendorServiceTest {
         request.setBusinessType("GROCERY");
         request.setCompanyPhoneNumber("08126188203");
         request.setCompanyRcNumber("123457698476");
-        request.setProductType("GRILL");
         request.setHouseNumber("216A");
         request.setStreet("Sabo");
         request.setState("Lagos");
@@ -151,7 +150,6 @@ public class FiddoveaVendorServiceTest {
         request.setBusinessType("GROCERY");
         request.setCompanyPhoneNumber("08126188203");
         request.setCompanyRcNumber("123457698476");
-        request.setProductType("GRILL");
         request.setHouseNumber("216A");
         request.setStreet("Sabo");
         request.setState("Lagos");
