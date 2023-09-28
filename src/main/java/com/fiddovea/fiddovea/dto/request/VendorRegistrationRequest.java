@@ -11,7 +11,6 @@ public class VendorRegistrationRequest {
     private String companyRcNumber;
     private String companyPhoneNumber;
     private String businessType;
-    private String productType;
     private String houseNumber;
     private String street;
     private String lga;

@@ -20,7 +20,7 @@ public class VendorServiceController {
     VendorService vendorService;
 
     @PostMapping
-    public ResponseEntity<VendorRegistrationResponse> registerCustomer(@RequestBody VendorRegistrationRequest registerRequest){
+    public ResponseEntity<VendorRegistrationResponse> registerVendor(@RequestBody VendorRegistrationRequest registerRequest){
         VendorRegistrationResponse registerResponse = vendorService.register(registerRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(registerResponse);
     }
@@ -61,6 +61,5 @@ public class VendorServiceController {
         List<Product> myOrders = vendorService.viewOrder(vendorId);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(myOrders);
     }
-
 
 }
