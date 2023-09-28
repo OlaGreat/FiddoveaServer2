@@ -20,7 +20,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
+<<<<<<< HEAD
 import java.time.Duration;
+=======
+>>>>>>> 54383a5e8f93c03fa27fdfbce2a73b958b0f7afb
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +46,8 @@ public class FiddoveaCustomerService implements CustomerService {
     private final ProductService productService;
     private final TokenService tokenService;
     private final ChatService chatService;
+
+    private final NotificationService notificationService;
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
@@ -216,6 +221,8 @@ public class FiddoveaCustomerService implements CustomerService {
         Product selectedProduct = productService.findById(productId);
         foundCustomer.getWishList().add(selectedProduct);
 
+        sendNotificationToCustomer(foundCustomer, selectedProduct);
+
         customerRepository.save(foundCustomer);
 
         WishListResponse wishListResponse = new WishListResponse();
@@ -232,6 +239,18 @@ public class FiddoveaCustomerService implements CustomerService {
             }
         }
     }
+
+
+    private void sendNotificationToCustomer(Customer customer, Product product) {
+        Notification notification = new Notification();
+        String message = product.getProductName()+ YOU_ADD_THE_PRODUCT_TO_YOUR_WISHLIST.name();
+//        notification.setMessage( );
+        notification.setTimestamp(LocalDateTime.now());
+        notification.setUserId(customer.getId());
+
+        notificationService.addNotification(product.getProductId(), message);
+    }
+
 
     @Override
     public List<Product> viewWishList(String customerId) {
@@ -304,6 +323,7 @@ public class FiddoveaCustomerService implements CustomerService {
     public List<Product> searchProduct(String productName) {
         return productService.findProductByName(productName);
     }
+
     @Override
     public ProductReviewResponse reviewProduct(ProductReviewRequest productReviewRequest) {
         String productId = productReviewRequest.getProductId();
