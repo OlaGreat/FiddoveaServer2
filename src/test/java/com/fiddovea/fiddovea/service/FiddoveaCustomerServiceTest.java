@@ -35,8 +35,8 @@ public class FiddoveaCustomerServiceTest {
     @Order(1)
     public void testThatCustomerCanRegister(){
         RegisterRequest request = new RegisterRequest();
-        request.setEmail("Oladipupoolamilekan@gmail.com");
-        request.setPassword("Oladipupo");
+        request.setEmail("dominicrotimi@gmail.com");
+        request.setPassword("password");
         RegisterResponse response = customerService.register(request);
         assertThat(response).isNotNull();
 
