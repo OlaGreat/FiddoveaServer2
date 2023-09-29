@@ -18,8 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @RequestMapping("api/v1/customer")
 @Slf4j
-//@CrossOrigin("*")
-
+@CrossOrigin("*")
 public class CustomerServiceController {
 
     private final CustomerService customerService;
@@ -32,7 +31,6 @@ public class CustomerServiceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(registerResponse);
     }
 
-
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> loginCustomer(@RequestBody LoginRequest loginRequest) {
         LoginResponse loginResponse = customerService.login(loginRequest);
@@ -40,7 +38,7 @@ public class CustomerServiceController {
     }
 
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<UpdateCustomerResponse>updateUserProfile(@ModelAttribute UpdateCustomerRequest updaterCustomerRequest, @PathVariable String id) throws JsonPatchException {
         UpdateCustomerResponse response = customerService.updateProfile(updaterCustomerRequest, id);
         return ResponseEntity.ok(response);

@@ -14,6 +14,9 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.JsonPatchOperation;
 import com.github.fge.jsonpatch.ReplaceOperation;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -22,10 +25,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.fiddovea.fiddovea.appUtils.AppUtils.*;
 import static com.fiddovea.fiddovea.data.models.Role.CUSTOMER;
@@ -58,7 +58,7 @@ public class FiddoveaCustomerService implements CustomerService {
 
         JavaMailerRequest javaMailerRequest = new JavaMailerRequest();
         javaMailerRequest.setTo(email);
-        javaMailerRequest.setMessage("Hello bellow is your token\\n" + token);
+        javaMailerRequest.setMessage("Hello bellow is your token " + token);
         javaMailerRequest.setSubject(otpSubject);
         sendToken(javaMailerRequest);
 
@@ -73,8 +73,14 @@ public class FiddoveaCustomerService implements CustomerService {
     public LoginResponse login(LoginRequest request) {
         String email = request.getEmail().toLowerCase();
         String password = request.getPassword();
-
         return verifyLoginDetails(email, password);
+    }
+    
+    public void logOut(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
     }
 
     @Override
@@ -199,6 +205,9 @@ public class FiddoveaCustomerService implements CustomerService {
             if(customer.getPassword().equals(password)){
                 LoginResponse loginResponse = new LoginResponse();
                 loginResponse.setMessage(WELCOME_BACK.name());
+                // If the login is successful, create a new session and store the customer ID as an attribute.
+//                HttpSession session = request.getSession();
+//                session.setAttribute("customerId", customer.getId());
                 return loginResponse;
             }else throw new BadCredentialsException(INVALID_LOGIN_DETAILS.getMessage());
         }else throw new BadCredentialsException(INVALID_LOGIN_DETAILS.getMessage());
@@ -240,9 +249,9 @@ public class FiddoveaCustomerService implements CustomerService {
 
     private void sendNotificationToCustomer(Customer customer, Product product) {
         Notification notification = new Notification();
-        String message = product.getProductName()+ YOU_ADD_THE_PRODUCT_TO_YOUR_WISHLIST.name();
+        List<String> message = Collections.singletonList(product.getProductName() + YOU_ADD_THE_PRODUCT_TO_YOUR_WISHLIST);
 //        notification.setMessage( );
-        notification.setTimestamp(LocalDateTime.now());
+//        notification.setTimestamp(LocalDateTime.now());
         notification.setUserId(customer.getId());
 
         notificationService.addNotification(product.getProductId(), message);

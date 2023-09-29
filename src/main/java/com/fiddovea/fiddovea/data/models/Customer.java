@@ -20,5 +20,6 @@ public class Customer extends User{
     private List<Address> addressList = new ArrayList<>();
     private List<Product> wishList = new ArrayList<>();
     private boolean isActive;
+    private Notification notification;
 
 }

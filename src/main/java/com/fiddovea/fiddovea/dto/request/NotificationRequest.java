@@ -1,14 +1,15 @@
 package com.fiddovea.fiddovea.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Setter
 @Getter
 public class NotificationRequest {
 
-    private String message;
+    private List<String> message;
 
 //    @JsonProperty("to")
 //    private String recipients_id;
