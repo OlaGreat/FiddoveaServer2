@@ -73,7 +73,7 @@ public class CustomerServiceController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("removefromwishlist")
+    @PostMapping("/removefromwishlist")
     public ResponseEntity<RemoveProductResponse> removeProductFromWishList(@RequestBody RemoveProductRequest removeProductRequest){
         RemoveProductResponse response = customerService.removeFromWishList(removeProductRequest);
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -84,6 +84,20 @@ public class CustomerServiceController {
         List<Product> productSearch = customerService.searchProduct(productName);
         return ResponseEntity.status(HttpStatus.OK).body(productSearch);
     }
+
+    @PostMapping("/verifytoken")
+    public ResponseEntity<TokenVerificationResponse> verifyToken(String email, String token){
+        TokenVerificationResponse response = customerService.verifyToken(email,token);
+        return  ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/viewcart/{customerId}")
+    public ResponseEntity<List<Product>> viewCart(@PathVariable String customerId){
+        List<Product> cart = customerService.viewCart(customerId);
+        return ResponseEntity.status(HttpStatus.OK).body(cart);
+    }
+
+
 
 
 }

@@ -10,7 +10,6 @@ import java.time.LocalDate;
 @Getter
 public class ProductReviewRequest {
     private String productId;
-    private LocalDate reviewDate;
     private String reviewContent;
     private double productRatings;
     private String reviewAuthor;

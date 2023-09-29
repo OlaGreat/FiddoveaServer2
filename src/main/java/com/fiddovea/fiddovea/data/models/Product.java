@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -20,8 +21,9 @@ public class Product {
     private String productDescription;
     private BigDecimal productPrice;
     private double discount;
-    private List<Review> productReviews;
+    private List<Review> productReviews = new ArrayList<>();
     private int productQuantity;
+    private ProductType productType;
     private String vendorId;
     private String productImageUrl;
 }

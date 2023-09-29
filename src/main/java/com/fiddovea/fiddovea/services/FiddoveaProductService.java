@@ -1,6 +1,7 @@
 package com.fiddovea.fiddovea.services;
 
 import com.fiddovea.fiddovea.data.models.Product;
+import com.fiddovea.fiddovea.data.models.ProductType;
 import com.fiddovea.fiddovea.data.repository.ProductRepository;
 import com.fiddovea.fiddovea.dto.request.ProductRequest;
 import com.fiddovea.fiddovea.exceptions.EmptyFieldsException;
@@ -42,6 +43,7 @@ public class FiddoveaProductService implements ProductService{
         product.setVendorId(vendorId);
         product.setProductQuantity(productRequest.getProductQuantity());
         product.setProductImageUrl(productImageUrl);
+        product.setProductType(ProductType.valueOf(productRequest.getProductType().toUpperCase()));
         Product savedProduct = productRepository.save(product);
 
         return savedProduct;
@@ -73,6 +75,16 @@ public class FiddoveaProductService implements ProductService{
     @Override
     public void deleteProduct(String productId) {
         productRepository.deleteById(productId);
+    }
+
+    @Override
+    public void saveProduct(Product product) {
+        productRepository.save(product);
+    }
+
+    @Override
+    public List<Product> getAllProduct() {
+        return productRepository.findAll();
     }
 }
 

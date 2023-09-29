@@ -142,7 +142,7 @@ public class FiddoveaCustomerServiceTest {
     void testThatAddToWishListThrowsExceptionForDuplicateProduct(){
         WishListRequest wishListRequest = new WishListRequest();
         wishListRequest.setCustomerId("65125697985f4b19b406d7b2");
-        wishListRequest.setProductId("650f31d2b2f7514ff894c31a");
+        wishListRequest.setProductId("6510c16533c9254cef1d9b58");
         assertThrows(ProductAlreadyAdded.class, ()-> customerService.addToWishList(wishListRequest));
     }
 
@@ -181,12 +181,50 @@ public class FiddoveaCustomerServiceTest {
         updateCustomerRequest.setHouseNumber("13");
 
 
-
         return updateCustomerRequest;
     }
 
-//    @Test
-//    void test that
+    @Test
+    @Order(13)
+    void testThatCustomerCanReviewProduct(){
+        ProductReviewRequest request = new ProductReviewRequest();
+        request.setProductRatings(4.7);
+        request.setReviewContent("The best i have tasted");
+        request.setProductId("6513c9891d61ad2834bd365f");
+        request.setReviewAuthor(" ");
+       ProductReviewResponse response = customerService.reviewProduct(request);
+        assertThat(response).isNotNull();
+    }
+
+    @Test
+    @Order(14)
+    void testThatCustomerReceivesOtp(){
+        RegisterRequest request = new RegisterRequest();
+        request.setEmail("greatcolourspaint@gmail.com");
+        request.setPassword("Oladipupo");
+        RegisterResponse response = customerService.register(request);
+        assertThat(response).isNotNull();
+    }
+
+    @Test
+    @Order(15)
+    void testVerifyOtp(){
+       TokenVerificationResponse response = customerService.verifyToken("greatcolourspaint@gmail.com", "11613");
+       assertThat(response).isNotNull();
+    }
+
+    @Test
+    @Order(16)
+    void testThatCustomerCanMakeOrder(){
+
+    }
+
+    @Test
+    void testThatCustomerCanViewCart(){
+       List<Product> cart = customerService.viewCart("65144107c024b32b4b18104f");
+       assertThat(cart.size()).isEqualTo(0);
+    }
+
 
 //    @Test
 //    public void testFindById(){

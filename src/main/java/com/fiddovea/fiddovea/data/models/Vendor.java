@@ -18,7 +18,6 @@ public class Vendor extends User{
     private Address companyAddress;
     private String companyPhoneNumber;
     private BusinessType businessType;
-    private ProductType productType;
     private List<Product> productList = new ArrayList<>();
     private List<Product> orders = new ArrayList<>();
     private boolean isActive;
