@@ -137,7 +137,6 @@ public class FiddoveaVendorServiceTest {
         request.setBusinessType("GROCERY");
         request.setCompanyPhoneNumber("08126188203");
         request.setCompanyRcNumber("123457698476");
-        request.setProductType("GRILL");
         request.setHouseNumber("216A");
         request.setStreet("Sabo");
         request.setState("Lagos");
@@ -152,7 +151,6 @@ public class FiddoveaVendorServiceTest {
         request.setBusinessType("GROCERY");
         request.setCompanyPhoneNumber("08126188203");
         request.setCompanyRcNumber("123457698476");
-        request.setProductType("GRILL");
         request.setHouseNumber("216A");
         request.setStreet("Sabo");
         request.setState("Lagos");
@@ -174,7 +172,7 @@ public class FiddoveaVendorServiceTest {
         sendNotificationToVendor("651258570a29fe6b94f9d353", Collections.singletonList(YOUR_PRODUCT_HAS_BEEN_ADDED_SUCCESSFULLY.toString()));
 
 
-        ProductResponse response = vendorService.addProduct(productRequest, "651258570a29fe6b94f9d353");
+        ProductResponse response = vendorService.addProduct(productRequest, "6511c40f29b0ca3c8d0cce62");
         assertThat(response).isNotNull();
 
         assertThat(capturedMessage).isEqualTo(Collections.singletonList(YOUR_PRODUCT_HAS_BEEN_ADDED_SUCCESSFULLY.toString()));

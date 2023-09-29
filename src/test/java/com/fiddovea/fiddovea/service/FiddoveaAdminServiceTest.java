@@ -82,7 +82,7 @@ public class FiddoveaAdminServiceTest {
         vendor.setBusinessType(BusinessType.GROCERY);
         vendor.setCompanyPhoneNumber("08126188203");
         vendor.setCompanyRcNumber("123457698476");
-        vendor.setProductType(ProductType.GRILL);
+
         Address address = new Address();
         address.setHouseNumber("216A");
         address.setStreet("Sabo");

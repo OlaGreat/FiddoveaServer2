@@ -8,10 +8,7 @@ import com.fiddovea.fiddovea.data.models.*;
 import com.fiddovea.fiddovea.data.repository.CustomerRepository;
 import com.fiddovea.fiddovea.dto.request.*;
 import com.fiddovea.fiddovea.dto.response.*;
-import com.fiddovea.fiddovea.exceptions.BadCredentialsException;
-import com.fiddovea.fiddovea.exceptions.FiddoveaException;
-import com.fiddovea.fiddovea.exceptions.ProductAlreadyAdded;
-import com.fiddovea.fiddovea.exceptions.UserNotFoundException;
+import com.fiddovea.fiddovea.exceptions.*;
 import com.github.fge.jackson.jsonpointer.JsonPointer;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
@@ -26,10 +23,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static com.fiddovea.fiddovea.appUtils.AppUtils.JSON_PATCH_PATH_PREFIX;
+import static com.fiddovea.fiddovea.appUtils.AppUtils.*;
 import static com.fiddovea.fiddovea.data.models.Role.CUSTOMER;
 import static com.fiddovea.fiddovea.dto.response.ResponseMessage.*;
 import static com.fiddovea.fiddovea.dto.response.ResponseMessage.PROFILE_UPDATE_SUCCESSFUL;
@@ -56,11 +54,18 @@ public class FiddoveaCustomerService implements CustomerService {
 
         Customer customer = customerMapper(email,password);
 
+        String token = tokenService.createToken(email);
 
-        Customer savedCustomer = customerRepository.save(customer);
+        JavaMailerRequest javaMailerRequest = new JavaMailerRequest();
+        javaMailerRequest.setTo(email);
+        javaMailerRequest.setMessage("Hello bellow is your token\\n" + token);
+        javaMailerRequest.setSubject(otpSubject);
+        sendToken(javaMailerRequest);
+
+        customerRepository.save(customer);
 
         RegisterResponse response = new RegisterResponse();
-        response.setMessage(REGISTRATION_SUCCESSFUL.name());
+        response.setMessage(REGISTRATION_SUCCESSFUL.name() + " "+ PLEASE_CHECK_YOUR_MAIL_FOR_VERIFICATION_CODE.name());
         return response;
     }
 
@@ -208,15 +213,6 @@ public class FiddoveaCustomerService implements CustomerService {
         }else throw new BadCredentialsException(INVALID_LOGIN_DETAILS.getMessage());
     }
 
-//    @Override
-//    public Optional<Customer> findById(String id) {
-//        Optional<Customer> customer = customerRepository.findById(id);
-//        if(customer.isPresent()){
-//            Customer foundCustomer = customer.get();
-//            return Optional.of(foundCustomer);
-//        }
-//        return Optional.empty();
-//    }
 
     @Override
     public WishListResponse addToWishList(WishListRequest wishListRequest) {
@@ -335,15 +331,24 @@ public class FiddoveaCustomerService implements CustomerService {
     }
 
     @Override
-    public ProductReviewResponse reviewProduct(ProductReviewRequest productReviewRequest, String customerId) {
-        Customer customer = findById(customerId);
-        String product = productReviewRequest.getProductId();
+    public ProductReviewResponse reviewProduct(ProductReviewRequest productReviewRequest) {
+        String productId = productReviewRequest.getProductId();
+
+
         Review review = new Review();
-        review.setReviewAuthor(productReviewRequest.getReviewAuthor());
         review.setReviewContent(productReviewRequest.getReviewContent());
         review.setProductRatings(productReviewRequest.getProductRatings());
-        review.setReviewDate(productReviewRequest.getReviewDate());
-        return null;
+        if (productReviewRequest.getReviewAuthor() != null && productReviewRequest.getReviewAuthor(). length() > 2){
+            review.setReviewAuthor(productReviewRequest.getReviewAuthor());
+        }else review.setReviewAuthor("Anonymous");
+        Product foundProduct = productService.findById(productId);
+        foundProduct.getProductReviews().add(review);
+        productService.saveProduct(foundProduct);
+
+        ProductReviewResponse productReviewResponse = new ProductReviewResponse();
+        productReviewResponse.setMessage(REVIEW_SUCCESSFUL_THANKS_FOR_YOUR_TIME.name());
+
+        return productReviewResponse;
     }
 
     @Override
@@ -354,6 +359,32 @@ public class FiddoveaCustomerService implements CustomerService {
     @Override
     public MessageResponse message(SendMessageRequest sendMessageRequest, String chatId) {
         return chatService.message(sendMessageRequest, chatId);
+    }
+
+    @Override
+    public TokenVerificationResponse verifyToken(String email, String token) {
+        Token foundToken = tokenService.findByOwnerEmail(email);
+        Duration durationBetween = Duration.between(foundToken.getTimeCreated(), LocalDateTime.now());
+        long durationDifference = durationBetween.toMinutes();
+
+        tokenService.deleteToken(foundToken.getId());
+        if (durationDifference > 15 ){
+            throw new TokenExpiredException(TOKEN_EXPIRED_PLEASE_GENERATE_ANOTHER_TOKEN_FOR_VERIFICATION.getMessage());
+        }
+        Customer foundCustomer = customerRepository.findByEmail(email);
+        foundCustomer.setActive(true);
+        customerRepository.save(foundCustomer);
+        TokenVerificationResponse response = new TokenVerificationResponse();
+        response.setMessage(VERIFICATION_SUCCESSFUL.name());
+
+        return response;
+    }
+
+    @Override
+    public List<Product> viewCart(String customerId) {
+       Customer foundCustomer = findById(customerId);
+       List<Product> cart = foundCustomer.getCart().getProducts();
+        return cart;
     }
 
 
@@ -369,6 +400,10 @@ public class FiddoveaCustomerService implements CustomerService {
         Customer foundCustomer = customerRepository.findById(customerId)
                 .orElseThrow(()-> new UserNotFoundException(USER_NOT_FOUND.getMessage()));
         return foundCustomer;
+    }
+
+    private void sendToken(JavaMailerRequest javaMailerRequest){
+        mailService.send(javaMailerRequest);
     }
 
     private void forgetPasswordMail(Customer foundCustomer) {
