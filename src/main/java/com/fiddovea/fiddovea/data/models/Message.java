@@ -13,6 +13,7 @@ public class Message {
     private String content;
     private String sendAt = sentAt();
 
+
     private String sentAt(){
         LocalDateTime localDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HH:mm:ss");

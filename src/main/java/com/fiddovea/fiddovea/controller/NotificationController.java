@@ -13,17 +13,18 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/notifications")
 @AllArgsConstructor
+@CrossOrigin("*")
 public class NotificationController {
 
     private final NotificationService notificationService;
 
-    @GetMapping("/{userId}")
+    @GetMapping("/notification/{userId}")
     public ResponseEntity<List<Notification>> getNotificationsByUserId(@PathVariable String userId) {
         List<Notification> notifications = notificationService.getNotificationsByUserId(userId);
         return ResponseEntity.ok(notifications);
     }
 
-    @PostMapping("/{userId}")
+    @PostMapping("/notification/{userId}")
     public ResponseEntity<Void> addNotification(@PathVariable String userId, @RequestBody NotificationRequest request) {
         notificationService.addNotification(userId, request.getMessage());
         return ResponseEntity.status(HttpStatus.CREATED).build();
