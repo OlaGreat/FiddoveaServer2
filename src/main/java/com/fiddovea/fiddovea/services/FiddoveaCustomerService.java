@@ -58,7 +58,7 @@ public class FiddoveaCustomerService implements CustomerService {
 
         JavaMailerRequest javaMailerRequest = new JavaMailerRequest();
         javaMailerRequest.setTo(email);
-        javaMailerRequest.setMessage("Hello bellow is your token\\n" + token);
+        javaMailerRequest.setMessage("Hello bellow is your token " + token);
         javaMailerRequest.setSubject(otpSubject);
         sendToken(javaMailerRequest);
 
