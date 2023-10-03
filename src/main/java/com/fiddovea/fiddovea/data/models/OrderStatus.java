@@ -1,5 +1,5 @@
 package com.fiddovea.fiddovea.data.models;
 
 public enum OrderStatus {
-    DELIVERED, PROCESSING, ENROUTE, CANCELLED
+    DELIVERED, PROCESSING, ENROUTE, CANCELLED,CONFIRMED, UNCONFIRMED
 }

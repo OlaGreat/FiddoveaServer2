@@ -1,5 +1,6 @@
 package com.fiddovea.fiddovea.controller;
 
+import com.fiddovea.fiddovea.data.models.Order;
 import com.fiddovea.fiddovea.data.models.Product;
 import com.fiddovea.fiddovea.dto.request.*;
 import com.fiddovea.fiddovea.dto.response.*;
@@ -85,8 +86,8 @@ public class CustomerServiceController {
         return ResponseEntity.status(HttpStatus.OK).body(productSearch);
     }
 
-    @PostMapping("/verifytoken")
-    public ResponseEntity<TokenVerificationResponse> verifyToken(String email, String token){
+    @PostMapping("/verifytoken/{email}")
+    public ResponseEntity<TokenVerificationResponse> verifyToken(@PathVariable String email, String token){
         TokenVerificationResponse response = customerService.verifyToken(email,token);
         return  ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -97,6 +98,18 @@ public class CustomerServiceController {
         return ResponseEntity.status(HttpStatus.OK).body(cart);
     }
 
+    @GetMapping("/view-orderHistory/{customerId}")
+    //TODO TEST WITH POSTMAN
+    public ResponseEntity<List<Order>> viewOrderHistory(@PathVariable String customerId){
+        List<Order> orderHistory = customerService.viewOrderHistory(customerId);
+        return ResponseEntity.status(HttpStatus.OK).body(orderHistory);
+    }
+
+    @PostMapping("/order/{customerId}")
+    public ResponseEntity<ConfirmOrderResponse> order (OrderRequest orderRequest, @PathVariable String customerId){
+        ConfirmOrderResponse orderResponse = customerService.order(orderRequest, customerId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderResponse);
+    }
 
 
 

@@ -55,8 +55,7 @@ public class FiddoveaProductService implements ProductService{
                 productRequest.getProductImage(),
                 productRequest.getProductName(),
                 productRequest.getProductDescription()
-        ).allMatch(Objects::nonNull) && productRequest.getProductQuantity() > 0
-                && productRequest.getProductPrice().compareTo(BigDecimal.ZERO) > 0;
+        ).allMatch(Objects::nonNull) && productRequest.getProductPrice().compareTo(BigDecimal.ZERO) > 0;
     }
 
     @Override
