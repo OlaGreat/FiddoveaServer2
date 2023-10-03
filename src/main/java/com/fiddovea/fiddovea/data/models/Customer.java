@@ -17,8 +17,8 @@ public class Customer extends User{
     private String id;
     private Cart cart;
     private List<Order> orders = new ArrayList<>();
-    private List<Address> addressList = new ArrayList<>();
     private List<Product> wishList = new ArrayList<>();
+    private List<Address> addressList = new ArrayList<>();
     private boolean isActive;
 
 }

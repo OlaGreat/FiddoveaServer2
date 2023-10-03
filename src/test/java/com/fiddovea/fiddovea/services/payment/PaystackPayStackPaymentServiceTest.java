@@ -15,9 +15,8 @@ class PaystackPayStackPaymentServiceTest {
     @Test
     void testPayment(){
         PaymentRequest request = new PaymentRequest();
-        request.setName("Sweet cake");
+        request.setEmail("Oladipupoolamilekan2@gmail.com");
         request.setAmount(150000);
-        request.setDescription("get ready");
         PaymentResponse response = paymentService.makePayment(request);
         System.out.println(response.toString());
 
