@@ -5,8 +5,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class TokenVerificationResponse {
+public class ConfirmOrderResponse {
     private String message;
-    private String userId;
 }
-

@@ -5,6 +5,7 @@ import com.fiddovea.fiddovea.data.models.OrderStatus;
 import com.fiddovea.fiddovea.data.models.Product;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Setter
 @Getter
+@ToString
 public class ViewOrderRequest {
 
     private List<Product> orderedProduct;

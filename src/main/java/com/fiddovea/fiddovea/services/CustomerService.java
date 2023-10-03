@@ -4,6 +4,7 @@ package com.fiddovea.fiddovea.services;
 import com.fiddovea.fiddovea.data.models.Chat;
 
 import com.fiddovea.fiddovea.data.models.Customer;
+import com.fiddovea.fiddovea.data.models.Order;
 import com.fiddovea.fiddovea.data.models.Product;
 import com.fiddovea.fiddovea.dto.request.*;
 import com.fiddovea.fiddovea.dto.response.*;
@@ -42,6 +43,10 @@ public interface CustomerService {
     TokenVerificationResponse verifyToken(String email, String token);
 
     List<Product> viewCart(String customerId);
+
+    ConfirmOrderResponse order(OrderRequest orderRequest, String customerId);
+
+    List<Order> viewOrderHistory(String customerId);
 
 }
 
