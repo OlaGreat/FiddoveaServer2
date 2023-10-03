@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 
 import static com.fiddovea.fiddovea.appUtils.AppUtils.BLANK_SPACE;
@@ -168,33 +169,31 @@ public class FiddoveaVendorServiceTest {
         productRequest.setDiscount(0);
         productRequest.setProductImage(getTestImage());
 
-        sendNotificationToVendor("651258570a29fe6b94f9d353", YOUR_PRODUCT_HAS_BEEN_ADDED_SUCCESSFULLY.name());
+        sendNotificationToVendor("651258570a29fe6b94f9d353", Collections.singletonList(YOUR_PRODUCT_HAS_BEEN_ADDED_SUCCESSFULLY.toString()));
 
 
         ProductResponse response = vendorService.addProduct(productRequest, "6511c40f29b0ca3c8d0cce62");
         assertThat(response).isNotNull();
 
-
-//        // Assert that the captured message matches the expected message
-        assertThat(capturedMessage).isEqualTo(YOUR_PRODUCT_HAS_BEEN_ADDED_SUCCESSFULLY.name());
+        assertThat(capturedMessage).isEqualTo(Collections.singletonList(YOUR_PRODUCT_HAS_BEEN_ADDED_SUCCESSFULLY.toString()));
 
         // Assert that the captured user ID matches the vendor ID
         assertThat(capturedUserId).isEqualTo("651258570a29fe6b94f9d353");
     }
 
 
-      private String capturedMessage;
+      private List<String> capturedMessage;
      private String capturedUserId;
 
 
-    private void sendNotificationToVendor(String vendorId, String message) {
+    private void sendNotificationToVendor(String vendorId, List<String> message) {
         capturedMessage = message;
         capturedUserId = vendorId;
         notificationService.addNotification(vendorId, message);
     }
 
     private MultipartFile getTestImage(){
-        Path path = Paths.get("C:\\Users\\DELL\\Documents\\ProjectWorks\\Fiddovea\\FiddoveaServer\\Fiddovea\\src\\test\\resources\\image\\STK160_X_Twitter_009.webp");
+        Path path = Paths.get("C:\\Users\\Admin\\FiddoveaServer2\\src\\test\\resources\\image\\STK160_X_Twitter_009.webp");
 
         try (var inputStream = Files.newInputStream(path)){
             MultipartFile image = new MockMultipartFile("new_image",inputStream);
