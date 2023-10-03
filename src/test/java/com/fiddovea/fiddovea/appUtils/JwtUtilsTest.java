@@ -1,5 +1,7 @@
 package com.fiddovea.fiddovea.appUtils;
 
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
@@ -11,10 +13,18 @@ class JwtUtilsTest {
 
     @Test
     public void testJwtTokenGeneration(){
-        String email = "oladipupoolamilekan2@gmail.com";
-        String token = JwtUtils.generateVerificationToken(email);
+        String userId = "123hfior94092";
+        String token = JwtUtils.generateAccessToken(userId);
         log.info("generated ---->{}", token);
         assertThat(token).isNotNull();
     }
+    @Test
+    public void testThatTokenCanBeRetrieveAndVerified(){
+
+
+
+//        String retrieve = JwtUtils.retrieveAndVerifyToken();
+    }
+
 
 }

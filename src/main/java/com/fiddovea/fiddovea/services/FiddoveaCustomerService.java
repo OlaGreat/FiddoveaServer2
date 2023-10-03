@@ -27,10 +27,10 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static com.fiddovea.fiddovea.appUtils.AppUtils.*;
+import static com.fiddovea.fiddovea.appUtils.AppUtils.JSON_PATCH_PATH_PREFIX;
+import static com.fiddovea.fiddovea.appUtils.AppUtils.otpSubject;
 import static com.fiddovea.fiddovea.data.models.Role.CUSTOMER;
 import static com.fiddovea.fiddovea.dto.response.ResponseMessage.*;
-import static com.fiddovea.fiddovea.dto.response.ResponseMessage.PROFILE_UPDATE_SUCCESSFUL;
 import static com.fiddovea.fiddovea.exceptions.ExceptionMessages.*;
 
 @Slf4j
@@ -43,8 +43,9 @@ public class FiddoveaCustomerService implements CustomerService {
     private final ProductService productService;
     private final TokenService tokenService;
     private final ChatService chatService;
-
     private final NotificationService notificationService;
+
+    private final OrderService orderService;
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
@@ -189,10 +190,8 @@ public class FiddoveaCustomerService implements CustomerService {
         JsonNode updatedNode = updatePatch.apply(userNode);
         //3. Convert updatedNode to user
         customer = objectMapper.convertValue(updatedNode, Customer.class);
-        log.info("user-->{}", customer);
         //4. Save updatedUser from step 3 in the DB
         var savedUser= customerRepository.save(customer);
-        log.info("user-->{}", savedUser);
         return new UpdateCustomerResponse(PROFILE_UPDATE_SUCCESSFUL.name());
 
     }
@@ -204,6 +203,7 @@ public class FiddoveaCustomerService implements CustomerService {
         if (customer != null){
             if(customer.getPassword().equals(password)){
                 LoginResponse loginResponse = new LoginResponse();
+                loginResponse.setUserId(customer.getId());
                 loginResponse.setMessage(WELCOME_BACK.name());
                 // If the login is successful, create a new session and store the customer ID as an attribute.
 //                HttpSession session = request.getSession();
@@ -375,6 +375,7 @@ public class FiddoveaCustomerService implements CustomerService {
         foundCustomer.setActive(true);
         customerRepository.save(foundCustomer);
         TokenVerificationResponse response = new TokenVerificationResponse();
+        response.setUserId(foundCustomer.getId());
         response.setMessage(VERIFICATION_SUCCESSFUL.name());
 
         return response;
@@ -385,6 +386,35 @@ public class FiddoveaCustomerService implements CustomerService {
        Customer foundCustomer = findById(customerId);
        List<Product> cart = foundCustomer.getCart().getProducts();
         return cart;
+    }
+
+    @Override
+    public ConfirmOrderResponse order(OrderRequest orderRequest, String customerId) {
+        Customer foundCustomer = findById(customerId);
+        List<Product> customerOrderedProduct = foundCustomer.getCart().getProducts();
+
+        Order customerOrder = orderService.order(orderRequest, customerId, customerOrderedProduct);
+
+        List<Order> orders = foundCustomer.getOrders();
+        orders.add(customerOrder);
+        foundCustomer.setOrders(orders);
+        System.out.println("i got here --------------->>>>> ()()()()()()()");
+        customerRepository.save(foundCustomer);
+
+
+        ConfirmOrderResponse orderResponse = new ConfirmOrderResponse();
+        orderResponse.setMessage(ORDER_CREATED_BUT_NOT_CONFIRMED.name());
+
+        return orderResponse;
+    }
+
+    @Override
+    // TODO TEST THIS METHOD WHEN YOU COMPLETE THE ORDER CLASS
+    public List<Order> viewOrderHistory(String customerId) {
+        Customer foundCustomer = findById(customerId);
+        List<Order> customerOrders = foundCustomer.getOrders();
+
+        return customerOrders;
     }
 
 
