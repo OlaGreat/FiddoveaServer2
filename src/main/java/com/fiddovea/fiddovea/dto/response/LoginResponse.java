@@ -7,4 +7,6 @@ import lombok.Setter;
 @Getter
 public class LoginResponse {
     String message;
+    String userId;
 }
+

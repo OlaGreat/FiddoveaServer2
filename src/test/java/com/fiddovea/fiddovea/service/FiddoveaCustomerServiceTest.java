@@ -17,6 +17,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.fiddovea.fiddovea.appUtils.AppUtils.BLANK_SPACE;
@@ -35,7 +36,7 @@ public class FiddoveaCustomerServiceTest {
     @Order(1)
     public void testThatCustomerCanRegister(){
         RegisterRequest request = new RegisterRequest();
-        request.setEmail("Oladipupoolamilekan@gmail.com");
+        request.setEmail("Oladipupoolamilekan4445@gmail.com");
         request.setPassword("Oladipupo");
         RegisterResponse response = customerService.register(request);
         assertThat(response).isNotNull();
@@ -216,6 +217,17 @@ public class FiddoveaCustomerServiceTest {
     @Test
     @Order(16)
     void testThatCustomerCanMakeOrder(){
+        OrderRequest request = new OrderRequest();
+
+        request.setOrderTotalAmount("50000");
+        request.setHouseNumber("6A");
+        request.setLga("Yaba");
+        request.setStreet("Sabo");
+        request.setState("Lagos");
+
+        ConfirmOrderResponse response = customerService.order(request, "650f84e1e7e3ce5c035725e4");
+        assertThat(response).isNotNull();
+
 
     }
 
@@ -225,12 +237,9 @@ public class FiddoveaCustomerServiceTest {
        assertThat(cart.size()).isEqualTo(0);
     }
 
-
 //    @Test
-//    public void testFindById(){
-//        Optional<Customer> customer = customerService.findById("6508d75e27cea05f89ed13e3");
-//        Customer foundCustomer = customer.get();
-//        assertThat(foundCustomer).isNotNull();
-//
+//    void testThatCustomerCanOrder(){
+//        ConfirmOrderResponse response = customerService.order("650f84e1e7e3ce5c035725e4");
+//        assertThat(response).isNotNull();
 //    }
 }

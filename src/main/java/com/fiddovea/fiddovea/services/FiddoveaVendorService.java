@@ -278,6 +278,7 @@ public class FiddoveaVendorService implements VendorService {
         if (vendor.isPresent()){
             if(vendor.get().getPassword().equals(password)){
                 LoginResponse loginResponse = new LoginResponse();
+                loginResponse.setUserId(vendor.get().getId());
                 loginResponse.setMessage(WELCOME_BACK.name());
                 return loginResponse;
             }else throw new BadCredentialsException(INVALID_LOGIN_DETAILS.getMessage());

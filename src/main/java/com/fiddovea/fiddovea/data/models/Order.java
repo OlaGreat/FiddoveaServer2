@@ -1,8 +1,6 @@
 package com.fiddovea.fiddovea.data.models;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.math.BigDecimal;
@@ -12,8 +10,10 @@ import java.util.List;
 
 @Setter
 @Getter
-@Builder
+@ToString
+@RequiredArgsConstructor
 @Document("orders")
+
 public class Order {
     @Id
     private String id;
@@ -27,10 +27,10 @@ public class Order {
 
 
 
-    public String setCreatedAt(){
+    private static String setCreatedAt(){
         LocalDateTime localDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyy HH:mm:ss");
-   return createdAt = localDateTime.format(formatter);
+    return localDateTime.format(formatter);
     }
 
 }

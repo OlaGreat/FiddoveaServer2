@@ -1,11 +1,13 @@
 package com.fiddovea.fiddovea.data.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Setter
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Document("address")
 public class Address {
     private String id;
