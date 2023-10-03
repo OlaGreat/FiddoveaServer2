@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PaymentRequest {
-    private String name;
+    private String email;
     private  int amount;
-    private String description;
+
 }
