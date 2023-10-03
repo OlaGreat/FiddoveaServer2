@@ -17,4 +17,5 @@ public class Admin  extends User{
     List<Vendor> toVerify;
     private Notification notification;
 
+
 }
