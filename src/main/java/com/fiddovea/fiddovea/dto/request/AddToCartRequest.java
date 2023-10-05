@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AddToCartRequest {
-    String productId;
-    String customerId;
+    private String productId;
+    private String customerId;
 }

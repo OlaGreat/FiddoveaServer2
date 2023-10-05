@@ -8,5 +8,11 @@ import lombok.*;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class PaymentResponse {
-    String message;
+    private String authorization_url;
+    private String message;
+
+    private String access_code;
+    private String reference;
+
+
 }
