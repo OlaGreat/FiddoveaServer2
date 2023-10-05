@@ -3,11 +3,13 @@ package com.fiddovea.fiddovea.services;
 import com.fiddovea.fiddovea.data.models.Token;
 import com.fiddovea.fiddovea.data.repository.TokenRepository;
 import com.fiddovea.fiddovea.exceptions.TokenExpiredException;
+import com.fiddovea.fiddovea.exceptions.UserNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
 
+import static com.fiddovea.fiddovea.exceptions.ExceptionMessages.THE_PROVIDED_EMAIL_IS_NOT_ATTACHED_TO_THE_TOKEN;
 import static com.fiddovea.fiddovea.exceptions.ExceptionMessages.TOKEN_EXPIRED_PLEASE_GENERATE_ANOTHER_TOKEN_FOR_VERIFICATION;
 
 
@@ -24,7 +26,7 @@ public class FiddoveaTokenService implements TokenService{
         String token = generateToken();
         Token userToken = new Token();
         userToken.setToken(token);
-        userToken.setOwnerEmail(userEmail);
+        userToken.setOwnerEmail(userEmail.toLowerCase());
         Token savedToken = tokenRepository.save(userToken);
         System.out.println(savedToken);
 
@@ -35,7 +37,8 @@ public class FiddoveaTokenService implements TokenService{
 
     @Override
     public Token findByOwnerEmail(String email) {
-        Token token = tokenRepository.findByownerEmail(email).orElseThrow(()-> new TokenExpiredException(TOKEN_EXPIRED_PLEASE_GENERATE_ANOTHER_TOKEN_FOR_VERIFICATION.getMessage()));
+        Token token = tokenRepository.findByOwnerEmail(email.toLowerCase())
+                .orElseThrow(()-> new UserNotFoundException(THE_PROVIDED_EMAIL_IS_NOT_ATTACHED_TO_THE_TOKEN.getMessage()));
         return token;
     }
 

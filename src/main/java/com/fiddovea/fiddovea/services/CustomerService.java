@@ -9,6 +9,7 @@ import com.fiddovea.fiddovea.data.models.Product;
 import com.fiddovea.fiddovea.dto.request.*;
 import com.fiddovea.fiddovea.dto.response.*;
 import com.github.fge.jsonpatch.JsonPatchException;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -23,27 +24,27 @@ public interface CustomerService {
 
     UpdateCustomerResponse updateProfile(UpdateCustomerRequest updateCustomerRequest, String id) throws JsonPatchException;
 
-    WishListResponse addToWishList(WishListRequest wishListRequest);
-    List<Product> viewWishList(String customerId);
+    WishListResponse addToWishList(String productId, HttpServletRequest servletRequest);
+    List<Product> viewWishList(HttpServletRequest request);
     List<Product> searchProduct(String productName);
 
-    AddToCartResponse addToCart(AddToCartRequest addToCartRequest);
+    AddToCartResponse addToCart(String productId, HttpServletRequest request);
     String forgetPassword(ForgetPasswordRequest forgetPasswordRequest);
-    RemoveProductResponse removeFromCart(RemoveProductRequest removeProductRequest);
-    RemoveProductResponse removeFromWishList(RemoveProductRequest request);
+    RemoveProductResponse removeFromCart(String productId, HttpServletRequest servletRequest);
+    RemoveProductResponse removeFromWishList(String productId, HttpServletRequest servletRequest);
 //    List<Product> filterByPrice();
 
-    ProductReviewResponse reviewProduct(ProductReviewRequest productReviewRequest);
-    Chat chatCustomerCare(String senderId);
+    ProductReviewResponse reviewProduct(ProductReviewRequest productReviewRequest, String productId, HttpServletRequest requestToken);
+    Chat chatCustomerCare(HttpServletRequest servletRequest);
     MessageResponse message(SendMessageRequest sendMessageRequest, String chatId);
 
     TokenVerificationResponse verifyToken(String email, String token);
 
-    List<Product> viewCart(String customerId);
+    List<Product> viewCart(HttpServletRequest servletRequest);
 
-    ConfirmOrderResponse order(OrderRequest orderRequest, String customerId);
+    ConfirmOrderResponse order(OrderRequest orderRequest, HttpServletRequest servletRequest);
 
-    List<Order> viewOrderHistory(String customerId);
+    List<Order> viewOrderHistory(HttpServletRequest servletRequest);
 
 }
 

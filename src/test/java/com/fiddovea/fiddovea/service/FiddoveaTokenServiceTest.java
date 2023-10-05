@@ -20,5 +20,11 @@ public class FiddoveaTokenServiceTest {
         System.out.println(token);
         assertThat(token).isNotNull();
     }
+    @Test
+    void testFindByOwnerId(){
+        Token token = tokenService.findByOwnerEmail("oladipupoolamilekan4@gmail.com");
+        System.out.println(token);
+        assertThat(token).isNotNull();
+    }
 
 }
