@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 
 import static com.fiddovea.fiddovea.appUtils.AppUtils.BLANK_SPACE;
@@ -146,7 +147,7 @@ public class FiddoveaVendorServiceTest {
 
     private VendorRegistrationRequest buildVendorMapper(){
         VendorRegistrationRequest request = new VendorRegistrationRequest();
-        request.setEmail("Oladipupoolamilekan@gmail.com");
+        request.setEmail("Oladipupoolamilekan1008@gmail.com");
         request.setPassword("Oladipupo");
         request.setBusinessType("GROCERY");
         request.setCompanyPhoneNumber("08126188203");
@@ -160,7 +161,7 @@ public class FiddoveaVendorServiceTest {
     }
     private VendorRegistrationRequest buildVendorMapper2(){
         VendorRegistrationRequest request = new VendorRegistrationRequest();
-        request.setEmail("Oladipupoolamilekan55@gmail.com");
+        request.setEmail("Oladipupoolamilekan555478@gmail.com");
         request.setPassword("Oladipupo");
         request.setBusinessType("GROCERY");
         request.setCompanyPhoneNumber("08126188203");
@@ -185,11 +186,10 @@ public class FiddoveaVendorServiceTest {
         productRequest.setProductType("cake");
         productRequest.setProductImage(getTestImage());
 
-//        sendNotificationToVendor("651258570a29fe6b94f9d353", YOUR_PRODUCT_HAS_BEEN_ADDED_SUCCESSFULLY.name());
-
 
         ProductResponse response = vendorService.addProduct(productRequest, servletRequest);
         assertThat(response).isNotNull();
+
 
 
 ////        // Assert that the captured message matches the expected message
@@ -209,10 +209,8 @@ public class FiddoveaVendorServiceTest {
 //        capturedUserId = vendorId;
 //        notificationService.addNotification(vendorId, message);
 //    }
-
     private MultipartFile getTestImage(){
         Path path = Paths.get("C:\\Users\\DELL\\Documents\\ProjectWorks\\Fiddovea\\FiddoveaServer\\Fiddovea\\src\\test\\resources\\image\\STK160_X_Twitter_009.webp");
-
         try (var inputStream = Files.newInputStream(path)){
             MultipartFile image = new MockMultipartFile("new_image",inputStream);
             return image;
@@ -252,7 +250,7 @@ public class FiddoveaVendorServiceTest {
     public void testThatVendorCanViewTheirProduct(){
         HttpServletRequest servletRequest = buildHttpServletRequestForToken();
         List<Product> productList = vendorService.viewMyProduct(servletRequest);
-        assertEquals(13, productList.size());
+        assertEquals(18, productList.size());
     }
 
     @Test

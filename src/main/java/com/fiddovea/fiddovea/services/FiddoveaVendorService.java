@@ -26,10 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.fiddovea.fiddovea.appUtils.AppUtils.JSON_PATCH_PATH_PREFIX;
 import static com.fiddovea.fiddovea.appUtils.AppUtils.PRODUCT_ADD_MESSAGE;
@@ -231,9 +228,9 @@ public class FiddoveaVendorService implements VendorService {
     private void sendNotificationToVendor(Vendor vendor, Product product) {
 
         Notification notification = new Notification();
-        String message = "Your product '" + product.getProductName() + "' has been added successfully.";
-//        notification.setMessage();
-        notification.setTimestamp(LocalDateTime.now());
+        List<String> message = Collections.singletonList("Your product '" + product.getProductName() + "' has been added successfully.");
+//        notification.setMessages();
+//        notification.setTimestamp(LocalDateTime.now());
         notification.setUserId(vendor.getId());
 
         notificationService.addNotification(product.getProductId(), message);
