@@ -10,5 +10,5 @@ public interface NotificationService {
 
     List<Notification> getNotificationsByUserId(String userId);
 
-     void addNotification(String userId, String message);
+    void addNotification(String userId, List<String> messages);
 }
