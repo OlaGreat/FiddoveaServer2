@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Setter
@@ -14,7 +15,7 @@ import java.util.List;
 public class Admin  extends User{
     @Id
     private String id;
-    List<Vendor> toVerify;
+    List<Vendor> toVerify = new ArrayList<>();
     private Notification notification;
 
 }
