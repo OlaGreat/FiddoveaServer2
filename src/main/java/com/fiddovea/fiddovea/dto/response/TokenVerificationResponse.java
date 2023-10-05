@@ -7,6 +7,6 @@ import lombok.Setter;
 @Getter
 public class TokenVerificationResponse {
     private String message;
-    private String userId;
+    private String userAccessToken;
 }
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fiddovea.fiddovea.appUtils.AppUtils;
+import com.fiddovea.fiddovea.appUtils.JwtUtils;
 import com.fiddovea.fiddovea.data.models.*;
 import com.fiddovea.fiddovea.data.repository.VendorRepository;
 import com.fiddovea.fiddovea.dto.request.*;
@@ -16,9 +17,11 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.JsonPatchOperation;
 import com.github.fge.jsonpatch.ReplaceOperation;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -50,7 +53,7 @@ public class FiddoveaVendorService implements VendorService {
     public VendorRegistrationResponse register(VendorRegistrationRequest request) {
         String password = request.getPassword();
         String email = request.getEmail().toLowerCase();
-        if(checkRegisterEmail(email)) throw new BadCredentialsException(EMAIL_ALREADY_EXIST.getMessage());
+        if(checkRegisterEmail(email)) throw new BadCredentialsException(EMAIL_ALREADY_EXIST                                                                                                                                                                                                                     .getMessage());
         Vendor vendor = new Vendor();
         vendor.setEmail(email);
         vendor.setPassword(password);
@@ -77,7 +80,7 @@ public class FiddoveaVendorService implements VendorService {
 
 
     @Override
-    public LoginResponse login(LoginRequest request) {
+    public VendorLoginResponse login(LoginRequest request) {
         String email = request.getEmail().toLowerCase();
         String password = request.getPassword();
 
@@ -119,8 +122,10 @@ public class FiddoveaVendorService implements VendorService {
 
 
     @Override
-    public UpdateVendorResponse updateProfile(UpdateVendorRequest updateVendorRequest, String id) throws JsonPatchException {
-        Vendor vendor = findVendorById(id);
+    public UpdateVendorResponse updateProfile(UpdateVendorRequest updateVendorRequest, HttpServletRequest request) throws JsonPatchException {
+        String vendorId = tokenVerifier(request);
+
+        Vendor vendor = findVendorById(vendorId);
         ModelMapper modelMapper = new ModelMapper();
         JsonPatch updatePatch = buildUpdatePatch(updateVendorRequest);
         log.info("patch-->{}", updatePatch);
@@ -137,6 +142,12 @@ public class FiddoveaVendorService implements VendorService {
 
         JsonPatch updatedPatch = buildUpdatePatch(updateVendorRequest);
         return applyPatch(updatedPatch, vendor);
+    }
+
+    private static String tokenVerifier(HttpServletRequest request) {
+        String token = JwtUtils.retrieveAndVerifyToken(request);
+        String vendorId = JwtUtils.extractUserIdFromToken(token);
+        return vendorId;
     }
 
 
@@ -196,11 +207,12 @@ public class FiddoveaVendorService implements VendorService {
 
 
     @Override
-    public ProductResponse addProduct(ProductRequest productRequest, String vendorId) {
+    public ProductResponse addProduct(ProductRequest productRequest, HttpServletRequest servletRequest) {
+        String authenticatedVendorId = tokenVerifier(servletRequest);
         Vendor vendor = vendorRepository
-                                  .findById(vendorId)
+                                  .findById(authenticatedVendorId)
                                   .orElseThrow(() -> new FiddoveaException(USER_NOT_FOUND.name()));
-        Product savedProduct = productService.addNewProduct(productRequest, vendorId);
+        Product savedProduct = productService.addNewProduct(productRequest, authenticatedVendorId);
 
         vendor.getProductList().add(savedProduct);
 
@@ -226,8 +238,9 @@ public class FiddoveaVendorService implements VendorService {
 
 
     @Override
-    public DeleteProductResponse deleteProduct(String vendorId, String productId) {
-        Vendor foundVendor = findVendorById(vendorId);
+    public DeleteProductResponse deleteProduct(String productId, HttpServletRequest servletRequest) {
+        String authenticatedVendorId = tokenVerifier(servletRequest);
+        Vendor foundVendor = findVendorById(authenticatedVendorId);
 
         List<Product> productList = foundVendor.getProductList();
         productList.removeIf(foundProduct -> foundProduct.getProductId().equals(productId));
@@ -242,15 +255,17 @@ public class FiddoveaVendorService implements VendorService {
     }
 
     @Override
-    public List<Product> viewMyProduct(String vendorId) {
-        Vendor foundVendor = findVendorById(vendorId);
+    public List<Product> viewMyProduct(HttpServletRequest servletRequest) {
+        String authenticatedVendorId = tokenVerifier(servletRequest);
+        Vendor foundVendor = findVendorById(authenticatedVendorId);
         List<Product> myProductList = foundVendor.getProductList();
         return myProductList;
     }
 
     @Override
-    public List<Product> viewOrder(String vendorId) {
-        Vendor foundVendor = findVendorById(vendorId);
+    public List<Product> viewOrder(HttpServletRequest servletRequest) {
+        String authenticatedVendorId = tokenVerifier(servletRequest);
+        Vendor foundVendor = findVendorById(authenticatedVendorId);
         return foundVendor.getOrders();
     }
 
@@ -270,12 +285,14 @@ public class FiddoveaVendorService implements VendorService {
                 .orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND.getMessage()));
     }
 
-    private LoginResponse verifyLoginDetails(String email, String password) {
+    private VendorLoginResponse verifyLoginDetails(String email, String password) {
         Optional<Vendor> vendor = vendorRepository.readByEmail(email);
         if (vendor.isPresent()){
             if(vendor.get().getPassword().equals(password)){
-                LoginResponse loginResponse = new LoginResponse();
-                loginResponse.setUserId(vendor.get().getId());
+                Vendor vendor1 = vendor.get();
+                VendorLoginResponse loginResponse = new VendorLoginResponse();
+                BeanUtils.copyProperties(vendor1, loginResponse);
+                loginResponse.setJwtToken(vendor.get().getId());
                 loginResponse.setMessage(WELCOME_BACK.name());
                 return loginResponse;
             }else throw new BadCredentialsException(INVALID_LOGIN_DETAILS.getMessage());
