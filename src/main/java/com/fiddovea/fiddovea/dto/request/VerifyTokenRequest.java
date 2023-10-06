@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class RemoveProductRequest {
-    private String productId;
+public class VerifyTokenRequest {
+    private String email;
 }

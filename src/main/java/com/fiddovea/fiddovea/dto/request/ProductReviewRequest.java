@@ -9,8 +9,8 @@ import java.time.LocalDate;
 @Setter
 @Getter
 public class ProductReviewRequest {
-    private String productId;
     private String reviewContent;
     private double productRatings;
-    private String reviewAuthor;
+    private String productId;
+
 }

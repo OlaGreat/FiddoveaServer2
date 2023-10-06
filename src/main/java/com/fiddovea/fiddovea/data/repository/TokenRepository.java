@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface TokenRepository extends MongoRepository<Token, String> {
 
-    Optional<Token> findByownerEmail(String email);
+    Optional<Token> findByOwnerEmail(String email);
 
 }

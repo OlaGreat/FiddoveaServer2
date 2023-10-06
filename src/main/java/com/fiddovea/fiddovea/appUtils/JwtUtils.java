@@ -25,7 +25,6 @@ public class JwtUtils {
                 .withIssuer(APP_NAME)
                 .withExpiresAt(Instant.now().plusSeconds(3600))
                 .sign(Algorithm.HMAC512(SECRET_KEY));
-       System.out.println(token);
         return token;
     }
 
