@@ -114,6 +114,7 @@ public class FiddoveaCustomerServiceTest {
 
         HttpServletRequest request = buildHttpServletRequestForToken();
         AddToCartResponse response = customerService.addToCart(productId,request);
+        System.out.println(response);
         assertThat(response).isNotNull();
     }
 
@@ -138,6 +139,7 @@ public class FiddoveaCustomerServiceTest {
     void testAddToWishList(){
         HttpServletRequest request = buildHttpServletRequestForToken();
         WishListResponse wishListResponse = customerService.addToWishList(productId, request);
+        System.out.println(wishListResponse);
         assertThat(wishListResponse).isNotNull();
     }
 

@@ -6,6 +6,5 @@ import lombok.Setter;
 @Setter
 @Getter
 public class WishListRequest {
-    String customerId;
-    String productId;
+    private String productId;
 }
