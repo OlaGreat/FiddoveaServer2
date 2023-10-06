@@ -46,9 +46,9 @@ public class VendorServiceController {
 
     }
 
-    @DeleteMapping("/deleteproduct/{productId}")
-    public ResponseEntity<DeleteProductResponse> deleteProduct(@PathVariable String productId, HttpServletRequest requestToken){
-        DeleteProductResponse response = vendorService.deleteProduct(productId, requestToken);
+    @DeleteMapping("/deleteproduct")
+    public ResponseEntity<DeleteProductResponse> deleteProduct(@RequestBody RemoveProductRequest request, HttpServletRequest requestToken){
+        DeleteProductResponse response = vendorService.deleteProduct(request.getProductId(), requestToken);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

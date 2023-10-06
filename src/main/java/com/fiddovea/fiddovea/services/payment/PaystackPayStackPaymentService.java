@@ -1,11 +1,13 @@
 package com.fiddovea.fiddovea.services.payment;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiddovea.fiddovea.config.AppConfig;
 import com.fiddovea.fiddovea.dto.request.PaymentRequest;
 import com.fiddovea.fiddovea.dto.response.PaymentResponse;
 import lombok.AllArgsConstructor;
 import okhttp3.*;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -38,13 +40,25 @@ public class PaystackPayStackPaymentService implements PaymentService {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<PaymentResponse> response =
                 restTemplate.postForEntity(paystackUrl,request, PaymentResponse.class);
+        ModelMapper mapper = new ModelMapper();
+        PaymentResponse paymentResponse = new PaymentResponse();
+        mapper.map(response.getBody(), paymentResponse);
 
-        PaymentResponse paymentResponse = response.getBody();
-
-
+        System.out.println(response.getBody())    ;
         return paymentResponse;
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
 
 

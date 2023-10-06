@@ -57,26 +57,26 @@ public class CustomerServiceController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(message);
     }
 
-    @PostMapping("/addtocart/{productId}")
-    public ResponseEntity<AddToCartResponse> addToCart(@PathVariable String productId, HttpServletRequest requestToken) {
-        AddToCartResponse addToCartResponse = customerService.addToCart(productId, requestToken);
+    @PostMapping("/addtocart")
+    public ResponseEntity<AddToCartResponse> addToCart(@RequestBody CartRequest cartRequest, HttpServletRequest requestToken) {
+        AddToCartResponse addToCartResponse = customerService.addToCart(cartRequest.getProductId(), requestToken);
         return ResponseEntity.status(HttpStatus.OK).body(addToCartResponse);
     }
-    @PostMapping("/addtowishlist/{productId}")
-    public ResponseEntity<WishListResponse> addToWishList(@PathVariable String productId, HttpServletRequest requestToken){
-        WishListResponse wishListResponse = customerService.addToWishList(productId, requestToken);
+    @PostMapping("/addtowishlist")
+    public ResponseEntity<WishListResponse> addToWishList(@RequestBody WishListRequest wishListRequest, HttpServletRequest requestToken){
+        WishListResponse wishListResponse = customerService.addToWishList(wishListRequest.getProductId(), requestToken);
         return ResponseEntity.status(HttpStatus.OK).body(wishListResponse);
     }
 
-    @PostMapping("/removefromcart/{productId}")
-    public ResponseEntity<RemoveProductResponse> removeProductFromCart(@PathVariable String productId, HttpServletRequest requestToken){
-        RemoveProductResponse response = customerService.removeFromCart(productId, requestToken);
+    @PostMapping("/removefromcart")
+    public ResponseEntity<RemoveProductResponse> removeProductFromCart(@RequestBody CartRequest cartRequest, HttpServletRequest requestToken){
+        RemoveProductResponse response = customerService.removeFromCart(cartRequest.getProductId(), requestToken);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/removefromwishlist/{productId}")
-    public ResponseEntity<RemoveProductResponse> removeProductFromWishList(@PathVariable String productId, HttpServletRequest requestToken){
-        RemoveProductResponse response = customerService.removeFromWishList(productId, requestToken);
+    @PostMapping("/removefromwishlist")
+    public ResponseEntity<RemoveProductResponse> removeProductFromWishList(@RequestBody WishListRequest wishListRequest, HttpServletRequest requestToken){
+        RemoveProductResponse response = customerService.removeFromWishList(wishListRequest.getProductId(), requestToken);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -86,9 +86,9 @@ public class CustomerServiceController {
         return ResponseEntity.status(HttpStatus.OK).body(productSearch);
     }
 
-    @PostMapping("/verifytoken/{email}")
-    public ResponseEntity<TokenVerificationResponse> verifyToken(@PathVariable String email, String token){
-        TokenVerificationResponse response = customerService.verifyToken(email,token);
+    @PostMapping("/verifytoken")
+    public ResponseEntity<TokenVerificationResponse> verifyToken(@RequestBody VerifyTokenRequest verifyTokenRequest, String token){
+        TokenVerificationResponse response = customerService.verifyToken(verifyTokenRequest.getEmail(),token);
         return  ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -106,18 +106,17 @@ public class CustomerServiceController {
     }
 
     @PostMapping("/order")
-    public ResponseEntity<ConfirmOrderResponse> order (OrderRequest orderRequest, HttpServletRequest requestToken){
+    public ResponseEntity<ConfirmOrderResponse> order (@RequestBody OrderRequest orderRequest, HttpServletRequest requestToken){
         ConfirmOrderResponse orderResponse = customerService.order(orderRequest, requestToken);
         return ResponseEntity.status(HttpStatus.CREATED).body(orderResponse);
     }
 
-    @PostMapping("/review/{productId}")
-    public ResponseEntity<ProductReviewResponse> reviewProduct(ProductReviewRequest reviewRequest, @PathVariable String productId, HttpServletRequest servletRequest){
-        ProductReviewResponse response = customerService.reviewProduct(reviewRequest, productId, servletRequest);
+    @PostMapping("/review")
+    public ResponseEntity<ProductReviewResponse> reviewProduct(@RequestBody ProductReviewRequest reviewRequest, HttpServletRequest servletRequest){
+        ProductReviewResponse response = customerService.reviewProduct(reviewRequest, reviewRequest.getProductId(), servletRequest);
         return ResponseEntity.status(HttpStatus.OK).body(response);
 
     }
-
 
 
 }

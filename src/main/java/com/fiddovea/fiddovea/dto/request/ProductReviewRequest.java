@@ -11,5 +11,6 @@ import java.time.LocalDate;
 public class ProductReviewRequest {
     private String reviewContent;
     private double productRatings;
+    private String productId;
 
 }
