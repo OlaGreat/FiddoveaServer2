@@ -227,7 +227,7 @@ public class FiddoveaCustomerService implements CustomerService {
         Customer foundCustomer = findById(verifiedUserId);
 
         List<Product> productList = foundCustomer.getWishList();
-        checkProductListForDuplicate(productId, productList);
+//        checkProductListForDuplicate(productId, productList);
 
         Product selectedProduct = productService.findById(productId);
         foundCustomer.getWishList().add(selectedProduct);
@@ -237,6 +237,7 @@ public class FiddoveaCustomerService implements CustomerService {
         customerRepository.save(foundCustomer);
 
         WishListResponse wishListResponse = new WishListResponse();
+        BeanUtils.copyProperties(selectedProduct, wishListResponse);
         wishListResponse.setMessage(PRODUCT_ADDED_TO_WISH_LIST.name());
 
 
@@ -284,7 +285,7 @@ public class FiddoveaCustomerService implements CustomerService {
         Customer foundCustomer = findById(customerId);
 
         List<Product> productList = foundCustomer.getCart().getProducts();
-        checkProductListForDuplicate(productId, productList);
+//        checkProductListForDuplicate(productId, productList);
 
         Product selectedProduct = productService.findById(productId);
         foundCustomer.getCart().getProducts().add(selectedProduct);
@@ -292,6 +293,7 @@ public class FiddoveaCustomerService implements CustomerService {
         customerRepository.save(foundCustomer);
 
         AddToCartResponse addToCartResponse = new AddToCartResponse();
+        BeanUtils.copyProperties(selectedProduct, addToCartResponse);
         addToCartResponse.setMessage(PRODUCT_ADDED_TO_CART.name());
         return addToCartResponse;
     }
