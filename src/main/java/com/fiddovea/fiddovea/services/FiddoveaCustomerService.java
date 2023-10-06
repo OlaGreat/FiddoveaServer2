@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fiddovea.fiddovea.appUtils.AppUtils;
+import com.fiddovea.fiddovea.appUtils.JwtUtils;
 import com.fiddovea.fiddovea.data.models.*;
 import com.fiddovea.fiddovea.data.repository.CustomerRepository;
 import com.fiddovea.fiddovea.dto.request.*;
@@ -15,11 +16,11 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.JsonPatchOperation;
 import com.github.fge.jsonpatch.ReplaceOperation;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -202,27 +203,31 @@ public class FiddoveaCustomerService implements CustomerService {
         Customer customer = customerRepository.findByEmail(email);
         if (customer != null){
             if(customer.getPassword().equals(password)){
-                LoginResponse loginResponse = new LoginResponse();
-                loginResponse.setUserId(customer.getId());
+                LoginResponse loginResponse = loginResponseMapper(customer);
                 loginResponse.setMessage(WELCOME_BACK.name());
-                // If the login is successful, create a new session and store the customer ID as an attribute.
-//                HttpSession session = request.getSession();
-//                session.setAttribute("customerId", customer.getId());
                 return loginResponse;
             }else throw new BadCredentialsException(INVALID_LOGIN_DETAILS.getMessage());
         }else throw new BadCredentialsException(INVALID_LOGIN_DETAILS.getMessage());
     }
 
+    private static LoginResponse loginResponseMapper(Customer customer) {
+        LoginResponse loginResponse = new LoginResponse();
+        String accessToken = JwtUtils.generateAccessToken(customer.getId());
+        BeanUtils.copyProperties(customer, loginResponse);
+        loginResponse.setJwtToken(accessToken);
+        loginResponse.setMessage(WELCOME_BACK.name());
+        return loginResponse;
+    }
+
 
     @Override
-    public WishListResponse addToWishList(WishListRequest wishListRequest) {
-        String customerId = wishListRequest.getCustomerId();
-        String productId = wishListRequest.getProductId();
+    public WishListResponse addToWishList(String productId, HttpServletRequest servletRequest) {
+        String verifiedUserId = tokenVerifier(servletRequest);
 
-        Customer foundCustomer = findById(customerId);
+        Customer foundCustomer = findById(verifiedUserId);
 
         List<Product> productList = foundCustomer.getWishList();
-        checkProductListForDuplicate(productId, productList);
+//        checkProductListForDuplicate(productId, productList);
 
         Product selectedProduct = productService.findById(productId);
         foundCustomer.getWishList().add(selectedProduct);
@@ -232,6 +237,7 @@ public class FiddoveaCustomerService implements CustomerService {
         customerRepository.save(foundCustomer);
 
         WishListResponse wishListResponse = new WishListResponse();
+        BeanUtils.copyProperties(selectedProduct, wishListResponse);
         wishListResponse.setMessage(PRODUCT_ADDED_TO_WISH_LIST.name());
 
 
@@ -259,21 +265,27 @@ public class FiddoveaCustomerService implements CustomerService {
 
 
     @Override
-    public List<Product> viewWishList(String customerId) {
+    public List<Product> viewWishList(HttpServletRequest request) {
+        String customerId = tokenVerifier(request);
         Customer customer = findById(customerId);
         List<Product> wishList = customer.getWishList();
         return wishList;
     }
 
+    private static String tokenVerifier(HttpServletRequest request) {
+        String verifiedToken = JwtUtils.retrieveAndVerifyToken(request);
+        String customerId = JwtUtils.extractUserIdFromToken(verifiedToken);
+        return customerId;
+    }
+
     @Override
-    public AddToCartResponse addToCart(AddToCartRequest addToCartRequest) {
-        String productId = addToCartRequest.getProductId();
-        String customerId = addToCartRequest.getCustomerId();
+    public AddToCartResponse addToCart(String productId, HttpServletRequest request) {
+        String customerId = tokenVerifier(request);
 
         Customer foundCustomer = findById(customerId);
 
         List<Product> productList = foundCustomer.getCart().getProducts();
-        checkProductListForDuplicate(productId, productList);
+//        checkProductListForDuplicate(productId, productList);
 
         Product selectedProduct = productService.findById(productId);
         foundCustomer.getCart().getProducts().add(selectedProduct);
@@ -281,24 +293,24 @@ public class FiddoveaCustomerService implements CustomerService {
         customerRepository.save(foundCustomer);
 
         AddToCartResponse addToCartResponse = new AddToCartResponse();
+        BeanUtils.copyProperties(selectedProduct, addToCartResponse);
         addToCartResponse.setMessage(PRODUCT_ADDED_TO_CART.name());
         return addToCartResponse;
     }
 
     @Override
     public String forgetPassword(ForgetPasswordRequest request) {
-        String userEmail = request.getEmail();
+        String userEmail = request.getEmail().toLowerCase();
         Customer foundCustomer = findByEmail(userEmail);
         forgetPasswordMail(foundCustomer);
         return IF_YOUR_EMAIL_IS_REGISTERED_YOU_WILL_GET_A_MESSAGE_FROM_US.name();
     }
 
     @Override
-    public RemoveProductResponse removeFromCart(RemoveProductRequest removeProductRequest) {
-        String customerId = removeProductRequest.getUserId();
-        String productId = removeProductRequest.getProductId();
+    public RemoveProductResponse removeFromCart(String productId, HttpServletRequest servletRequest) {
+        String verifedUserId = tokenVerifier(servletRequest);
 
-        Customer foundCustomer = findById(customerId);
+        Customer foundCustomer = findById(verifedUserId);
 
         List<Product> productList = foundCustomer.getCart().getProducts();
         productList.removeIf(foundProduct -> foundProduct.getProductId().equals(productId));
@@ -312,9 +324,8 @@ public class FiddoveaCustomerService implements CustomerService {
     }
 
     @Override
-    public RemoveProductResponse removeFromWishList(RemoveProductRequest request) {
-        String customerId = request.getUserId();
-        String productId = request.getProductId();
+    public RemoveProductResponse removeFromWishList(String productId, HttpServletRequest servletRequest) {
+        String customerId = tokenVerifier(servletRequest);
 
         Customer foundCustomer = findById(customerId);
         List<Product> productList = foundCustomer.getWishList();
@@ -331,16 +342,14 @@ public class FiddoveaCustomerService implements CustomerService {
     }
 
     @Override
-    public ProductReviewResponse reviewProduct(ProductReviewRequest productReviewRequest) {
-        String productId = productReviewRequest.getProductId();
-
+    public ProductReviewResponse reviewProduct(ProductReviewRequest productReviewRequest, String productId, HttpServletRequest requestToken) {
+        String authenticatedUserId = tokenVerifier(requestToken);
+        Customer customer = findById(authenticatedUserId);
 
         Review review = new Review();
         review.setReviewContent(productReviewRequest.getReviewContent());
         review.setProductRatings(productReviewRequest.getProductRatings());
-        if (productReviewRequest.getReviewAuthor() != null && productReviewRequest.getReviewAuthor(). length() > 2){
-            review.setReviewAuthor(productReviewRequest.getReviewAuthor());
-        }else review.setReviewAuthor("Anonymous");
+        review.setReviewAuthor(customer.getFirstName() + " " + customer.getLastName());
         Product foundProduct = productService.findById(productId);
         foundProduct.getProductReviews().add(review);
         productService.saveProduct(foundProduct);
@@ -352,8 +361,9 @@ public class FiddoveaCustomerService implements CustomerService {
     }
 
     @Override
-    public Chat chatCustomerCare(String senderId) {
-        return chatService.chatCustomerCare(senderId);
+    public Chat chatCustomerCare(HttpServletRequest servletRequest) {
+       String verifiedCustomerId = tokenVerifier(servletRequest);
+        return chatService.chatCustomerCare(verifiedCustomerId);
     }
 
     @Override
@@ -363,42 +373,45 @@ public class FiddoveaCustomerService implements CustomerService {
 
     @Override
     public TokenVerificationResponse verifyToken(String email, String token) {
-        Token foundToken = tokenService.findByOwnerEmail(email);
+        Token foundToken = tokenService.findByOwnerEmail(email.toLowerCase());
         Duration durationBetween = Duration.between(foundToken.getTimeCreated(), LocalDateTime.now());
         long durationDifference = durationBetween.toMinutes();
+        System.out.println(durationDifference);
 
         tokenService.deleteToken(foundToken.getId());
         if (durationDifference > 15 ){
             throw new TokenExpiredException(TOKEN_EXPIRED_PLEASE_GENERATE_ANOTHER_TOKEN_FOR_VERIFICATION.getMessage());
         }
-        Customer foundCustomer = customerRepository.findByEmail(email);
+        Customer foundCustomer = customerRepository.findByEmail(email.toLowerCase());
         foundCustomer.setActive(true);
         customerRepository.save(foundCustomer);
         TokenVerificationResponse response = new TokenVerificationResponse();
-        response.setUserId(foundCustomer.getId());
+        String accessToken = JwtUtils.generateAccessToken(foundCustomer.getId());
+        response.setUserAccessToken(accessToken);
         response.setMessage(VERIFICATION_SUCCESSFUL.name());
 
         return response;
     }
 
     @Override
-    public List<Product> viewCart(String customerId) {
-       Customer foundCustomer = findById(customerId);
+    public List<Product> viewCart(HttpServletRequest servletRequest) {
+        String verifiedCustomerId = tokenVerifier(servletRequest);
+       Customer foundCustomer = findById(verifiedCustomerId);
        List<Product> cart = foundCustomer.getCart().getProducts();
         return cart;
     }
 
     @Override
-    public ConfirmOrderResponse order(OrderRequest orderRequest, String customerId) {
-        Customer foundCustomer = findById(customerId);
+    public ConfirmOrderResponse order(OrderRequest orderRequest, HttpServletRequest servletRequest) {
+        String verifiedUserId = tokenVerifier(servletRequest);
+        Customer foundCustomer = findById(verifiedUserId);
         List<Product> customerOrderedProduct = foundCustomer.getCart().getProducts();
 
-        Order customerOrder = orderService.order(orderRequest, customerId, customerOrderedProduct);
+        Order customerOrder = orderService.order(orderRequest, verifiedUserId, customerOrderedProduct);
 
         List<Order> orders = foundCustomer.getOrders();
         orders.add(customerOrder);
         foundCustomer.setOrders(orders);
-        System.out.println("i got here --------------->>>>> ()()()()()()()");
         customerRepository.save(foundCustomer);
 
 
@@ -410,8 +423,9 @@ public class FiddoveaCustomerService implements CustomerService {
 
     @Override
     // TODO TEST THIS METHOD WHEN YOU COMPLETE THE ORDER CLASS
-    public List<Order> viewOrderHistory(String customerId) {
-        Customer foundCustomer = findById(customerId);
+    public List<Order> viewOrderHistory(HttpServletRequest servletRequest) {
+        String verifiedCustomerId = tokenVerifier(servletRequest);
+        Customer foundCustomer = findById(verifiedCustomerId);
         List<Order> customerOrders = foundCustomer.getOrders();
 
         return customerOrders;
