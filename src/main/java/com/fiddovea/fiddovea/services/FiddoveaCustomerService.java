@@ -51,6 +51,7 @@ public class FiddoveaCustomerService implements CustomerService {
     @Override
     public RegisterResponse register(RegisterRequest request) {
         String email = request.getEmail().toLowerCase();
+        System.out.println(email);
         String password = request.getPassword();
         if(checkRegisterEmail(email)) throw new BadCredentialsException(EMAIL_ALREADY_EXIST.getMessage());
 
@@ -135,11 +136,13 @@ public class FiddoveaCustomerService implements CustomerService {
         JsonNode updatedNode = updatePatch.apply(customerNode);
         Customer updatedCustomer = objectMapper.convertValue(updatedNode, Customer.class);
 
-//        Address userAddress = customer.getAddress();
-//        modelMapper.map(updateCustomerRequest, userAddress);
-//        customer.setAddress(userAddress);
+
+
+
+
         customerRepository.save(updatedCustomer);
         modelMapper.map(updateCustomerRequest, customer);
+
 
         JsonPatch updatedPatch = buildUpdatePatch(updateCustomerRequest);
         return applyPatch(updatedPatch, customer);
@@ -190,6 +193,9 @@ public class FiddoveaCustomerService implements CustomerService {
         JsonNode updatedNode = updatePatch.apply(userNode);
         //3. Convert updatedNode to user
         customer = objectMapper.convertValue(updatedNode, Customer.class);
+
+        String email = customer.getEmail().toLowerCase();
+        customer.setEmail(email);
         //4. Save updatedUser from step 3 in the DB
         var savedUser= customerRepository.save(customer);
         return new UpdateCustomerResponse(PROFILE_UPDATE_SUCCESSFUL.name());
@@ -230,9 +236,6 @@ public class FiddoveaCustomerService implements CustomerService {
 
         Product selectedProduct = productService.findById(productId);
         foundCustomer.getWishList().add(selectedProduct);
-
-        sendNotificationToCustomer(foundCustomer, selectedProduct);
-
         customerRepository.save(foundCustomer);
 
         WishListResponse wishListResponse = new WishListResponse();
@@ -250,18 +253,6 @@ public class FiddoveaCustomerService implements CustomerService {
             }
         }
     }
-
-
-    private void sendNotificationToCustomer(Customer customer, Product product) {
-        Notification notification = new Notification();
-        List<String> message = Collections.singletonList(product.getProductName() + YOU_ADD_THE_PRODUCT_TO_YOUR_WISHLIST);
-//        notification.setMessage( );
-//        notification.setTimestamp(LocalDateTime.now());
-        notification.setUserId(customer.getId());
-
-        notificationService.addNotification(product.getProductId(), message);
-    }
-
 
     @Override
     public List<Product> viewWishList(HttpServletRequest request) {
