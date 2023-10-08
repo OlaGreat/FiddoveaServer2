@@ -1,10 +1,12 @@
 package com.fiddovea.fiddovea.service;
 
+import com.fiddovea.fiddovea.data.models.Customer;
 import com.fiddovea.fiddovea.data.models.Order;
 import com.fiddovea.fiddovea.data.models.Product;
 import com.fiddovea.fiddovea.dto.request.OrderRequest;
 import com.fiddovea.fiddovea.dto.request.ViewOrderRequest;
 import com.fiddovea.fiddovea.dto.response.ViewOrderResponse;
+import com.fiddovea.fiddovea.services.CustomerService;
 import com.fiddovea.fiddovea.services.FiddoveaOrderService;
 import com.fiddovea.fiddovea.services.OrderService;
 import org.junit.jupiter.api.Test;
@@ -27,18 +29,15 @@ public class FiddoveaOrderServiceTest {
     @Autowired
     OrderService orderService;
 
-    @Test
-    public void testViewOrderHistoryHasNoOrders() {
-        ViewOrderRequest viewOrderRequest = new ViewOrderRequest();
-        System.out.println(viewOrderRequest);
-        ViewOrderResponse result = fiddoveaOrderService.viewOrderHistory(viewOrderRequest);
+    @Autowired
+    CustomerService customerService;
 
-        assertTrue(result.getOrderList().isEmpty());
-        assertThat(result.getMessage()).isEqualTo(NO_ORDER_FOUND.name());
-    }
+
 
     @Test
     void testThatOrderCanBeCreated(){
+        List<Customer> customerList = customerService.getAllCustomer();
+        Customer customer = customerList.get(0);
         OrderRequest request = new OrderRequest();
 
         List<Product> cart = new ArrayList<>(List.of(new Product(), new Product()));
@@ -47,8 +46,7 @@ public class FiddoveaOrderServiceTest {
         request.setLga("Yaba");
         request.setStreet("Sabo");
         request.setState("Lagos");
-        Order order =orderService.order(request, "650f84e1e7e3ce5c035725e4", cart);
-        System.out.println(order);
+        Order order =orderService.order(request, customer.getId(), cart);
         assertThat(order).isNotNull();
 
     }

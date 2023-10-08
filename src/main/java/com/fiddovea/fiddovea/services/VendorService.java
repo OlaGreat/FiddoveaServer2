@@ -2,6 +2,7 @@ package com.fiddovea.fiddovea.services;
 
 import com.fiddovea.fiddovea.data.models.Chat;
 import com.fiddovea.fiddovea.data.models.Product;
+import com.fiddovea.fiddovea.data.models.Vendor;
 import com.fiddovea.fiddovea.dto.request.*;
 import com.fiddovea.fiddovea.dto.response.*;
 import com.github.fge.jsonpatch.JsonPatchException;
@@ -24,4 +25,6 @@ public interface VendorService {
     List<Product> viewOrder(HttpServletRequest servletRequest);
     Chat chatCustomerCare(String senderId);
     MessageResponse message(SendMessageRequest sendMessageRequest, String chatId);
+
+    List<Vendor> getAllVendor();
 }
