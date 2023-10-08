@@ -15,4 +15,11 @@ public class UpdateCustomerRequest {
     private String password;
     private String email;
 
+
+
+
+
+
+
+
 }
