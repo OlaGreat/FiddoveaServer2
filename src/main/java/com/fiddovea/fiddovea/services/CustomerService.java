@@ -47,6 +47,7 @@ public interface CustomerService {
     ConfirmOrderResponse order(OrderRequest orderRequest, HttpServletRequest servletRequest);
 
     List<Order> viewOrderHistory(HttpServletRequest servletRequest);
+    List<Customer> getAllCustomer();
 
 }
 

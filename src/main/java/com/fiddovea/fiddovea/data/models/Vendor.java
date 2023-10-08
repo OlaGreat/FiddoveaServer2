@@ -23,4 +23,5 @@ public class Vendor extends User{
     private boolean isActive;
     private Notification notification;
 
+
 }

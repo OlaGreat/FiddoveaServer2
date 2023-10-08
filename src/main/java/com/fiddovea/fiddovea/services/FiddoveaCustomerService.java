@@ -158,11 +158,10 @@ public class FiddoveaCustomerService implements CustomerService {
 
 
     private boolean validateField(UpdateCustomerRequest updateCustomerRequest, Field field) {
-        List<String> excludedFields = List.of("gender", "houseNumber", "lga", "street", "state");
         field.setAccessible(true);
 
         try {
-            return field.get(updateCustomerRequest) != null && !excludedFields.contains(field.getName());
+            return field.get(updateCustomerRequest) != null;
         } catch (IllegalAccessException e) {
             throw new FiddoveaException(e.getMessage());
         }
@@ -227,7 +226,7 @@ public class FiddoveaCustomerService implements CustomerService {
         Customer foundCustomer = findById(verifiedUserId);
 
         List<Product> productList = foundCustomer.getWishList();
-//        checkProductListForDuplicate(productId, productList);
+        checkProductListForDuplicate(productId, productList);
 
         Product selectedProduct = productService.findById(productId);
         foundCustomer.getWishList().add(selectedProduct);
@@ -285,7 +284,7 @@ public class FiddoveaCustomerService implements CustomerService {
         Customer foundCustomer = findById(customerId);
 
         List<Product> productList = foundCustomer.getCart().getProducts();
-//        checkProductListForDuplicate(productId, productList);
+        checkProductListForDuplicate(productId, productList);
 
         Product selectedProduct = productService.findById(productId);
         foundCustomer.getCart().getProducts().add(selectedProduct);
@@ -373,16 +372,16 @@ public class FiddoveaCustomerService implements CustomerService {
 
     @Override
     public TokenVerificationResponse verifyToken(String email, String token) {
-        Token foundToken = tokenService.findByOwnerEmail(email.toLowerCase());
+        String userEmail = email.toLowerCase();
+        Token foundToken = tokenService.findByOwnerEmail(userEmail);
         Duration durationBetween = Duration.between(foundToken.getTimeCreated(), LocalDateTime.now());
         long durationDifference = durationBetween.toMinutes();
-        System.out.println(durationDifference);
 
         tokenService.deleteToken(foundToken.getId());
         if (durationDifference > 15 ){
             throw new TokenExpiredException(TOKEN_EXPIRED_PLEASE_GENERATE_ANOTHER_TOKEN_FOR_VERIFICATION.getMessage());
         }
-        Customer foundCustomer = customerRepository.findByEmail(email.toLowerCase());
+        Customer foundCustomer = customerRepository.findByEmail(userEmail);
         foundCustomer.setActive(true);
         customerRepository.save(foundCustomer);
         TokenVerificationResponse response = new TokenVerificationResponse();
@@ -429,6 +428,11 @@ public class FiddoveaCustomerService implements CustomerService {
         List<Order> customerOrders = foundCustomer.getOrders();
 
         return customerOrders;
+    }
+
+    @Override
+    public List<Customer> getAllCustomer() {
+        return customerRepository.findAll();
     }
 
 

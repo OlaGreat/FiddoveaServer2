@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface OrderService {
 
-    ViewOrderResponse viewOrderHistory(ViewOrderRequest viewOrderRequest);
+
     Order order(OrderRequest orderRequest, String customerId, List<Product> customerCart);
 
 }

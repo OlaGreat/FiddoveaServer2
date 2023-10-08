@@ -15,10 +15,7 @@ public class UpdateVendorRequest {
     private String  companyRcNumber;
     private String companyPhoneNumber;
     private String businessType;
-    private String productType;
-    private Address companyAddress;
-    private String houseNumber;
-    private String street;
-    private String lga;
-    private String state;
+
+
+
 }

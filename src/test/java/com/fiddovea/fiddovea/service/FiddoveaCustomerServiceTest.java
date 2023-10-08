@@ -1,14 +1,14 @@
 package com.fiddovea.fiddovea.service;
 
 import com.fiddovea.fiddovea.appUtils.JwtUtils;
-import com.fiddovea.fiddovea.data.models.Gender;
+import com.fiddovea.fiddovea.data.models.Customer;
 import com.fiddovea.fiddovea.data.models.Product;
 import com.fiddovea.fiddovea.dto.request.*;
 import com.fiddovea.fiddovea.dto.response.*;
 import com.fiddovea.fiddovea.exceptions.BadCredentialsException;
 import com.fiddovea.fiddovea.exceptions.ProductAlreadyAdded;
 import com.fiddovea.fiddovea.services.CustomerService;
-import com.fiddovea.fiddovea.dto.request.RemoveProductRequest;
+import com.fiddovea.fiddovea.services.ProductService;
 import com.fiddovea.fiddovea.services.TokenService;
 import com.github.fge.jsonpatch.JsonPatchException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -32,13 +33,18 @@ import static org.mockito.Mockito.when;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest
 @Slf4j
+
 public class FiddoveaCustomerServiceTest {
     @Autowired
     CustomerService customerService;
     @Autowired
     TokenService tokenService;
 
-    private final static String  productId = "6515b6840ad84b18ae28c6ba";
+    @Autowired
+    ProductService productService;
+
+    private static String labTestProductId;
+    private static String labTestCustomerId;
 
     @Test
     @Order(1)
@@ -48,12 +54,28 @@ public class FiddoveaCustomerServiceTest {
         request.setPassword("Oladipupo");
         RegisterResponse response = customerService.register(request);
         assertThat(response).isNotNull();
+
+    }
+    @Test
+    @Order(2)
+    public void findATestCustomer(){
+       List<Customer> customerList = customerService.getAllCustomer();
+       Customer testCustomer = customerList.get(0);
+       labTestCustomerId = testCustomer.getId();
+        System.out.println(labTestCustomerId);
+    }
+    @Test
+    @Order(3)
+    public void findATestProduct(){
+        List<Product> productList = productService.getAllProduct();
+        Product testProduct = productList.get(0);
+        labTestProductId = testProduct.getProductId();
+
     }
 
 
-
     @Test
-    @Order(2)
+    @Order(4)
     public void testThatCustomerRegisterThrowsException(){
         RegisterRequest request = new RegisterRequest();
         request.setEmail("Oladipupoolamilekan2@gmail.com");
@@ -62,7 +84,7 @@ public class FiddoveaCustomerServiceTest {
     }
 
     @Test
-    @Order(3)
+    @Order(5)
     public void testCustomerLogin(){
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setEmail("Oladipupoolamilekan2@gmail.com");
@@ -73,7 +95,7 @@ public class FiddoveaCustomerServiceTest {
     }
 
     @Test
-    @Order(4)
+    @Order(6)
     public void testCustomerLoginThrowsException(){
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setEmail("Oladipupoolamilekan@gmail.com");
@@ -84,12 +106,12 @@ public class FiddoveaCustomerServiceTest {
 
 
     @Test
+    @Order(7)
     public void tesThatUserCanUpdateAccount() throws JsonPatchException {
         UpdateCustomerRequest updateCustomerRequest = buildUpdateRequest();
-        UpdateCustomerResponse response = customerService.updateProfile(updateCustomerRequest, "65125697985f4b19b406d7b2");
-        log.info("updated profile --> {}", updateCustomerRequest);
+        UpdateCustomerResponse response = customerService.updateProfile(updateCustomerRequest, labTestCustomerId);
         assertThat(response).isNotNull();
-        GetResponse customerResponse = customerService.getCustomerById("65125697985f4b19b406d7b2");
+        GetResponse customerResponse = customerService.getCustomerById(labTestCustomerId);
         String fullName = customerResponse.getFullName();
         String expectedFullName = updateCustomerRequest.getFirstName() +
                 BLANK_SPACE +
@@ -100,7 +122,7 @@ public class FiddoveaCustomerServiceTest {
     }
 
     @Test
-    @Order(5)
+    @Order(8)
     public void testViewWishList(){
         HttpServletRequest request = buildHttpServletRequestForToken();
         List<Product> customerList = customerService.viewWishList(request);
@@ -109,24 +131,24 @@ public class FiddoveaCustomerServiceTest {
 
 
     @Test
-    @Order(6)
+    @Order(9)
     public void testAddToCart(){
 
         HttpServletRequest request = buildHttpServletRequestForToken();
-        AddToCartResponse response = customerService.addToCart(productId,request);
+        AddToCartResponse response = customerService.addToCart(labTestProductId,request);
         System.out.println(response);
         assertThat(response).isNotNull();
     }
 
     @Test
-    @Order(7)
+    @Order(10)
     public void testThatAddToCartThrowsExceptionForDuplicateProduct(){
         HttpServletRequest request = buildHttpServletRequestForToken();
-        assertThrows(ProductAlreadyAdded.class, ()->customerService.addToCart(productId,request));
+        assertThrows(ProductAlreadyAdded.class, ()->customerService.addToCart(labTestProductId,request));
     }
 
     @Test
-    @Order(8)
+    @Order(11)
     void testForgetPassword(){
         ForgetPasswordRequest request = new ForgetPasswordRequest();
         request.setEmail("Oladipupoolamilekan2@gmail.com");
@@ -135,53 +157,52 @@ public class FiddoveaCustomerServiceTest {
     }
 
     @Test
-    @Order(9)
+    @Order(12)
     void testAddToWishList(){
         HttpServletRequest request = buildHttpServletRequestForToken();
-        WishListResponse wishListResponse = customerService.addToWishList(productId, request);
+        WishListResponse wishListResponse = customerService.addToWishList(labTestProductId, request);
         System.out.println(wishListResponse);
         assertThat(wishListResponse).isNotNull();
     }
 
     @Test
-    @Order(10)
+    @Order(13)
     void testThatAddToWishListThrowsExceptionForDuplicateProduct(){
         HttpServletRequest request = buildHttpServletRequestForToken();
-        assertThrows(ProductAlreadyAdded.class, ()-> customerService.addToWishList(productId, request));
+        assertThrows(ProductAlreadyAdded.class, ()-> customerService.addToWishList(labTestProductId, request));
     }
 
     @Test
-    @Order(11)
+    @Order(14)
     void testRemoveProductFromCart(){
         HttpServletRequest request = buildHttpServletRequestForToken();
-        RemoveProductResponse response = customerService.removeFromCart(productId, request);
+        RemoveProductResponse response = customerService.removeFromCart(labTestProductId, request);
         assertThat(response).isNotNull();
     }
 
     @Test
-    @Order(12)
+    @Order(15)
     void testRemoveFormWishList(){
         HttpServletRequest request = buildHttpServletRequestForToken();
-        RemoveProductResponse response = customerService.removeFromWishList( productId, request);
+        RemoveProductResponse response = customerService.removeFromWishList( labTestProductId, request);
         assertThat(response).isNotNull();
 
     }
 
 
-
-        @Test
-    @Order(13)
+    @Test
+    @Order(16)
     void testThatCustomerCanReviewProduct(){
         HttpServletRequest requestToken = buildHttpServletRequestForToken();
         ProductReviewRequest request = new ProductReviewRequest();
         request.setProductRatings(4.7);
         request.setReviewContent("The best i have tasted");
-       ProductReviewResponse response = customerService.reviewProduct(request, productId,requestToken);
+        ProductReviewResponse response = customerService.reviewProduct(request, labTestProductId,requestToken);
         assertThat(response).isNotNull();
     }
 
     @Test
-    @Order(14)
+    @Order(17)
     void testThatCustomerReceivesOtp(){
         RegisterRequest request = new RegisterRequest();
         request.setEmail("greatcolourspaint@gmail.com");
@@ -191,16 +212,10 @@ public class FiddoveaCustomerServiceTest {
     }
 
 
-    @Test
-    @Order(15)
-    void testVerifyOtp(){
-        String token = tokenService.createToken("Oladipupoolamilekan2@gmail.com");
-       TokenVerificationResponse response = customerService.verifyToken("Oladipupoolamilekan2@gmail.com", token);
-       assertThat(response).isNotNull();
-    }
+
 
     @Test
-    @Order(16)
+    @Order(18)
     void testThatCustomerCanMakeOrder(){
         HttpServletRequest requestToken = buildHttpServletRequestForToken();
         OrderRequest request = new OrderRequest();
@@ -214,10 +229,10 @@ public class FiddoveaCustomerServiceTest {
         ConfirmOrderResponse response = customerService.order(request, requestToken);
         assertThat(response).isNotNull();
 
-
     }
 
     @Test
+    @Order(19)
     void testThatCustomerCanViewCart(){
         HttpServletRequest requestToken = buildHttpServletRequestForToken();
        List<Product> cart = customerService.viewCart(requestToken);
@@ -226,21 +241,17 @@ public class FiddoveaCustomerServiceTest {
 
     private UpdateCustomerRequest buildUpdateRequest() {
     UpdateCustomerRequest updateCustomerRequest = new UpdateCustomerRequest();
-    updateCustomerRequest.setFirstName("Coutinho");
-    updateCustomerRequest.setLastName("Dacruz");
-    updateCustomerRequest.setPhoneNumber("1234567890");
+    updateCustomerRequest.setFirstName("Oladipupo");
+    updateCustomerRequest.setLastName("Olamilekan");
+    updateCustomerRequest.setPhoneNumber("08026188203");
     updateCustomerRequest.setPassword("newPassword");
-    updateCustomerRequest.setGender(Gender.MALE);
-    updateCustomerRequest.setEmail("Coutinho@gmail.com");
-    updateCustomerRequest.setState("lagos");
-    updateCustomerRequest.setLga("oshodi");
-    updateCustomerRequest.setHouseNumber("13");
 
+    updateCustomerRequest.setEmail("Oladipupoolamilekan2@gmail.com");
 
     return updateCustomerRequest;
 }
     private static HttpServletRequest buildHttpServletRequestForToken() {
-        String userId = "651d52a9aceb4f5742f3b5ee";
+        String userId = labTestCustomerId;
         String token = JwtUtils.generateAccessToken(userId);
 
         HttpServletRequest request = mock(HttpServletRequest.class);

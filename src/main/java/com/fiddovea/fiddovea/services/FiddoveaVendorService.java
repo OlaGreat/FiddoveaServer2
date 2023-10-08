@@ -124,15 +124,14 @@ public class FiddoveaVendorService implements VendorService {
     @Override
     public UpdateVendorResponse updateProfile(UpdateVendorRequest updateVendorRequest, HttpServletRequest request) throws JsonPatchException {
         String vendorId = tokenVerifier(request);
-
         Vendor vendor = findVendorById(vendorId);
         ModelMapper modelMapper = new ModelMapper();
         JsonPatch updatePatch = buildUpdatePatch(updateVendorRequest);
-        log.info("patch-->{}", updatePatch);
+
         ObjectMapper objectMapper = new ObjectMapper();
 
         JsonNode vendorNode = objectMapper.convertValue(vendor, JsonNode.class);
-        log.info("node--->{}", vendorNode);
+
         JsonNode updatedNode = updatePatch.apply(vendorNode);
         Vendor updatedCustomer = objectMapper.convertValue(updatedNode, Vendor.class);
 
@@ -178,10 +177,10 @@ public class FiddoveaVendorService implements VendorService {
     }
 
     private boolean validateField(UpdateVendorRequest updateVendorRequest, Field field) {
-        List<String> excludedFields = List.of("companyAddress");
+
         field.setAccessible(true);
         try {
-            return field.get(updateVendorRequest) != null && !excludedFields.contains(field.getName());
+            return field.get(updateVendorRequest) != null;
         } catch (IllegalAccessException e) {
             throw new FiddoveaException(e.getMessage());
         }
@@ -200,7 +199,7 @@ public class FiddoveaVendorService implements VendorService {
 //        log.info("user-->{}", vendor);
         //4. Save updatedUser from step 3 in the DB
         var savedUser= vendorRepository.save(vendor);
-        log.info("user-->{}", savedUser);
+
         return new UpdateVendorResponse(PROFILE_UPDATE_SUCCESSFUL.name());
 
     }
@@ -277,6 +276,12 @@ public class FiddoveaVendorService implements VendorService {
     @Override
     public MessageResponse message(SendMessageRequest sendMessageRequest, String chatId) {
         return chatService.message(sendMessageRequest, chatId);
+    }
+
+    @Override
+    public List<Vendor> getAllVendor() {
+        List<Vendor> vendorList = vendorRepository.findAll();
+        return vendorList;
     }
 
 

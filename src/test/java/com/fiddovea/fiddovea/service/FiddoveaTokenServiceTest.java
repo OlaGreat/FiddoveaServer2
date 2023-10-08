@@ -17,13 +17,11 @@ public class FiddoveaTokenServiceTest {
     @Test
     void testThatTokenCanBeGenerated(){
         String token = tokenService.createToken(AppUtils.APP_MAIL_SENDER);
-        System.out.println(token);
         assertThat(token).isNotNull();
     }
     @Test
     void testFindByOwnerId(){
-        Token token = tokenService.findByOwnerEmail("oladipupoolamilekan4@gmail.com");
-        System.out.println(token);
+        Token token = tokenService.findByOwnerEmail("oladipupoolamilekan2@gmail.com");
         assertThat(token).isNotNull();
     }
 

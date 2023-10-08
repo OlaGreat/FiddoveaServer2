@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -24,26 +25,9 @@ public class FiddoveaOrderService implements OrderService {
 
     private final OrderRepository orderRepository;
 
-
-    @Override
-    public ViewOrderResponse viewOrderHistory(ViewOrderRequest viewOrderRequest) {
-        List<Order> orders = orderRepository.findByStatus(viewOrderRequest);
-        ViewOrderResponse viewOrderResponse = new ViewOrderResponse();
-        if (orders.isEmpty()) {
-            viewOrderResponse.setOrderList(Collections.emptyList());
-            viewOrderResponse.setMessage(NO_ORDER_FOUND.name());
-        } else {
-            viewOrderResponse.setOrderList(orders);
-        }
-
-        return viewOrderResponse;
-    }
-
-
     @Override
     public Order order(OrderRequest orderRequest, String customerId, List<Product> customerCart) {
         String orderTotalAmount = orderRequest.getOrderTotalAmount();
-        LocalDateTime orderedOn = LocalDateTime.now();
 
         Address deliveryAddress = Address.builder()
                 .state(orderRequest.getState())
@@ -59,7 +43,6 @@ public class FiddoveaOrderService implements OrderService {
         Order order = new Order();
         order.setOrderAmount(new BigDecimal(orderTotalAmount));
         order.setOrderedProduct(customerCart);
-        order.setDeliveryDate(orderedOn.plusDays(7));
         order.setStatus(UNCONFIRMED);
         order.setCustomerId(customerId);
         order.setDeliveryAddress(deliveryAddress);

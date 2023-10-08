@@ -13,10 +13,6 @@ public class UpdateCustomerRequest {
     private String lastName;
     private String phoneNumber;
     private String password;
-    private Gender gender;
     private String email;
-    private String houseNumber;
-    private String street;
-    private String lga;
-    private String state;
+
 }

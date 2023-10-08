@@ -28,7 +28,6 @@ public class FiddoveaTokenService implements TokenService{
         userToken.setToken(token);
         userToken.setOwnerEmail(userEmail.toLowerCase());
         Token savedToken = tokenRepository.save(userToken);
-        System.out.println(savedToken);
 
         String tokenToSend = savedToken.getToken();
 
