@@ -27,6 +27,7 @@ import java.lang.reflect.Field;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.fiddovea.fiddovea.appUtils.AppUtils.JSON_PATCH_PATH_PREFIX;
 import static com.fiddovea.fiddovea.appUtils.AppUtils.otpSubject;
@@ -327,7 +328,10 @@ public class FiddoveaCustomerService implements CustomerService {
     }
     @Override
     public List<Product> searchProduct(String productName) {
-        return productService.findProductByName(productName);
+        return productService.getAllProduct()
+                .stream()
+                .filter(product -> product.getProductName().contains(productName))
+                .collect(Collectors.toList());
     }
 
     @Override
