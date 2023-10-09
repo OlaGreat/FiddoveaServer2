@@ -81,8 +81,8 @@ public class CustomerServiceController {
     }
 
     @GetMapping("/product/search")
-    public ResponseEntity<List<Product>> searchProduct(@RequestParam String productName){
-        List<Product> productSearch = customerService.searchProduct(productName);
+    public ResponseEntity<List<Product>> searchProduct(@RequestParam String query) {
+        List<Product> productSearch = customerService.searchProduct(query);
         return ResponseEntity.status(HttpStatus.OK).body(productSearch);
     }
 
