@@ -50,8 +50,7 @@ public class FiddoveaCustomerService implements CustomerService {
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
-        String email = request.getEmail().toLowerCase();
-        System.out.println(email);
+        String email = request.getEmail().toLowerCase().trim();
         String password = request.getPassword();
         if(checkRegisterEmail(email)) throw new BadCredentialsException(EMAIL_ALREADY_EXIST.getMessage());
 
@@ -74,7 +73,7 @@ public class FiddoveaCustomerService implements CustomerService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
-        String email = request.getEmail().toLowerCase();
+        String email = request.getEmail().toLowerCase().trim();
         String password = request.getPassword();
         return verifyLoginDetails(email, password);
     }
@@ -290,7 +289,7 @@ public class FiddoveaCustomerService implements CustomerService {
 
     @Override
     public String forgetPassword(ForgetPasswordRequest request) {
-        String userEmail = request.getEmail().toLowerCase();
+        String userEmail = request.getEmail().toLowerCase().trim();
         Customer foundCustomer = findByEmail(userEmail);
         forgetPasswordMail(foundCustomer);
         return IF_YOUR_EMAIL_IS_REGISTERED_YOU_WILL_GET_A_MESSAGE_FROM_US.name();
@@ -363,7 +362,7 @@ public class FiddoveaCustomerService implements CustomerService {
 
     @Override
     public TokenVerificationResponse verifyToken(String email, String token) {
-        String userEmail = email.toLowerCase();
+        String userEmail = email.toLowerCase().trim();
         Token foundToken = tokenService.findByOwnerEmail(userEmail);
         Duration durationBetween = Duration.between(foundToken.getTimeCreated(), LocalDateTime.now());
         long durationDifference = durationBetween.toMinutes();
