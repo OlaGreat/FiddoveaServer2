@@ -30,7 +30,7 @@ public class FiddoveaAdminService implements AdminService{
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
-        String email = request.getEmail().toLowerCase();
+        String email = request.getEmail().toLowerCase().trim();
         String password = request.getPassword();
         if(checkRegisterEmail(email)) throw new BadCredentialsException(EMAIL_ALREADY_EXIST.getMessage());
 
@@ -48,7 +48,7 @@ public class FiddoveaAdminService implements AdminService{
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
-        String email = loginRequest.getEmail().toLowerCase();
+        String email = loginRequest.getEmail().toLowerCase().trim();
         String password = loginRequest.getPassword();
 
         Admin admin = adminRepository.readByEmail(email)

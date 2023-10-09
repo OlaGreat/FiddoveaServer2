@@ -25,6 +25,7 @@ public class AppUtils {
     public static boolean verifyEmail(String email){
         return  email.matches("^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
     }
-
-
+    public static String takeOutWhiteSpaces(String userInput){
+        return userInput.toLowerCase().trim();
+    }
 }

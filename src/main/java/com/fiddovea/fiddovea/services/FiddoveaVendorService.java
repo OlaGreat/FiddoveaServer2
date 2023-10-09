@@ -52,7 +52,7 @@ public class FiddoveaVendorService implements VendorService {
     @Override
     public VendorRegistrationResponse register(VendorRegistrationRequest request) {
         String password = request.getPassword();
-        String email = request.getEmail().toLowerCase();
+        String email = request.getEmail().toLowerCase().trim();
         if(checkRegisterEmail(email)) throw new BadCredentialsException(EMAIL_ALREADY_EXIST                                                                                                                                                                                                                     .getMessage());
         Vendor vendor = new Vendor();
         vendor.setEmail(email);
@@ -81,7 +81,7 @@ public class FiddoveaVendorService implements VendorService {
 
     @Override
     public VendorLoginResponse login(LoginRequest request) {
-        String email = request.getEmail().toLowerCase();
+        String email = request.getEmail().toLowerCase().trim();
         String password = request.getPassword();
 
         return verifyLoginDetails(email, password);
