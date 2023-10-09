@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @AllArgsConstructor
 @RequestMapping("api/v1/admin")
-@CrossOrigin("*")
 public class AdminServiceController {
     AdminService adminService;
 
