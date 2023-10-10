@@ -30,6 +30,7 @@ import java.util.*;
 
 import static com.fiddovea.fiddovea.appUtils.AppUtils.JSON_PATCH_PATH_PREFIX;
 import static com.fiddovea.fiddovea.appUtils.AppUtils.PRODUCT_ADD_MESSAGE;
+import static com.fiddovea.fiddovea.appUtils.JwtUtils.generateAccessToken;
 import static com.fiddovea.fiddovea.data.models.Role.VENDOR;
 import static com.fiddovea.fiddovea.dto.response.ResponseMessage.*;
 import static com.fiddovea.fiddovea.exceptions.ExceptionMessages.*;
@@ -297,7 +298,7 @@ public class FiddoveaVendorService implements VendorService {
                 Vendor vendor1 = vendor.get();
                 VendorLoginResponse loginResponse = new VendorLoginResponse();
                 BeanUtils.copyProperties(vendor1, loginResponse);
-                loginResponse.setJwtToken(vendor.get().getId());
+                loginResponse.setJwtToken(generateAccessToken(vendor.get().getId()));
                 loginResponse.setMessage(WELCOME_BACK.name());
                 return loginResponse;
             }else throw new BadCredentialsException(INVALID_LOGIN_DETAILS.getMessage());
