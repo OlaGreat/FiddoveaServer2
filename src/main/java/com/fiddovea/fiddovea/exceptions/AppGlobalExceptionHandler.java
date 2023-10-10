@@ -22,6 +22,15 @@ public class AppGlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
 
     }
+
+    @ExceptionHandler(value = {TokenExpiredException.class})
+    @ResponseStatus(BAD_REQUEST)
+    public ResponseEntity<?> handler(TokenExpiredException tokenExpiredException){
+        var response = ApiResponse.builder().data(tokenExpiredException.getMessage()).build();
+        return ResponseEntity.badRequest().body(response);
+    }
+
+
     @ExceptionHandler(value = {IOException.class})
     @ResponseStatus(BAD_REQUEST)
     public ResponseEntity<?> handler(IOException exception){
