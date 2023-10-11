@@ -330,7 +330,7 @@ public class FiddoveaCustomerService implements CustomerService {
     public List<Product> searchProduct(String productName) {
         return productService.getAllProduct()
                 .stream()
-                .filter(product -> product.getProductName().contains(productName))
+                .filter(product -> product.getProductName().contains(productName.trim()))
                 .collect(Collectors.toList());
     }
 

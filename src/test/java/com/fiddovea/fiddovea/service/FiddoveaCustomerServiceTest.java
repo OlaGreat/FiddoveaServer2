@@ -238,6 +238,12 @@ public class FiddoveaCustomerServiceTest {
        assertThat(cart.size()).isEqualTo(0);
     }
 
+    @Test
+    void testProductSearch(){
+        List<Product> matchedProduct = customerService.searchProduct("   cake");
+        System.out.println(matchedProduct);
+    }
+
     private UpdateCustomerRequest buildUpdateRequest() {
     UpdateCustomerRequest updateCustomerRequest = new UpdateCustomerRequest();
     updateCustomerRequest.setFirstName("Oladipupo");
