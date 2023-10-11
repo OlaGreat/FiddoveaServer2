@@ -1,6 +1,7 @@
 package com.fiddovea.fiddovea.controller;
 
 import com.fiddovea.fiddovea.data.models.Product;
+import com.fiddovea.fiddovea.dto.request.CategoryRequest;
 import com.fiddovea.fiddovea.services.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,4 +29,11 @@ public class ProductController {
         Product product = productService.findById(productId);
         return ResponseEntity.status(HttpStatus.OK).body(product);
     }
+
+    @GetMapping("/category")
+    ResponseEntity <List<Product>> getProductByCategory(@RequestBody CategoryRequest categoryRequest){
+        List<Product> response = productService.getProductByCategory(categoryRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }
+

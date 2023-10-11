@@ -1,6 +1,7 @@
 package com.fiddovea.fiddovea.services;
 
 import com.fiddovea.fiddovea.data.models.Product;
+import com.fiddovea.fiddovea.dto.request.CategoryRequest;
 import com.fiddovea.fiddovea.dto.request.ProductRequest;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface ProductService {
     void saveProduct(Product product);
 
     List<Product> getAllProduct();
+
+    List<Product> getProductByCategory(CategoryRequest categoryRequest);
 }

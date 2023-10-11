@@ -3,6 +3,7 @@ package com.fiddovea.fiddovea.services;
 import com.fiddovea.fiddovea.data.models.Product;
 import com.fiddovea.fiddovea.data.models.ProductType;
 import com.fiddovea.fiddovea.data.repository.ProductRepository;
+import com.fiddovea.fiddovea.dto.request.CategoryRequest;
 import com.fiddovea.fiddovea.dto.request.ProductRequest;
 import com.fiddovea.fiddovea.exceptions.EmptyFieldsException;
 import com.fiddovea.fiddovea.exceptions.ProductNotFoundException;
@@ -86,6 +87,12 @@ public class FiddoveaProductService implements ProductService{
         return productRepository.findAll();
     }
 
+    @Override
+    public List<Product> getProductByCategory(CategoryRequest categoryRequest) {
+        ProductType productType = ProductType.valueOf(categoryRequest.getCategory().toUpperCase());
+        List<Product> products = productRepository.findByProductType(productType);
+        return products;
+    }
 
 }
 
