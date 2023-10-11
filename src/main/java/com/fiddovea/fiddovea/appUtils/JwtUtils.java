@@ -23,7 +23,7 @@ public class JwtUtils {
         String token = JWT.create()
                 .withClaim(USER_ID, id)
                 .withIssuer(APP_NAME)
-                .withExpiresAt(Instant.now().plusSeconds(3600))
+                .withExpiresAt(Instant.now().plusSeconds(2592000))
                 .sign(Algorithm.HMAC512(SECRET_KEY));
         return token;
     }
@@ -42,11 +42,6 @@ public class JwtUtils {
 
         DecodedJWT verifiedToken = verifier.verify(authorizationToken);
 
-        Instant expirationInstant = verifiedToken.getExpiresAt().toInstant();
-        Instant now = Instant.now();
-        if (now.isAfter(expirationInstant)) {
-            throw new TokenExpiredException(TOKEN_EXPIRED_PLEASE_GENERATE_ANOTHER_TOKEN_FOR_VERIFICATION.getMessage());
-        }
             if (verifiedToken != null) {
                 return authorizationToken;
             }
