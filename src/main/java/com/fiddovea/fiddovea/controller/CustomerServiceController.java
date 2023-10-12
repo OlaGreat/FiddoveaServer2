@@ -40,7 +40,7 @@ public class CustomerServiceController {
 
 
     @PutMapping("/update")
-    public ResponseEntity<UpdateCustomerResponse>updateUserProfile(@ModelAttribute UpdateCustomerRequest updaterCustomerRequest, HttpServletRequest servletRequest) throws JsonPatchException {
+    public ResponseEntity<UpdateCustomerResponse>updateUserProfile(@RequestBody UpdateCustomerRequest updaterCustomerRequest, HttpServletRequest servletRequest) throws JsonPatchException {
         UpdateCustomerResponse response = customerService.updateProfile(updaterCustomerRequest, servletRequest);
         return ResponseEntity.ok(response);
     }
