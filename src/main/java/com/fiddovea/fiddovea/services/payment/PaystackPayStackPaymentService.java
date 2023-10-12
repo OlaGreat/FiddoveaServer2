@@ -32,6 +32,8 @@ public class PaystackPayStackPaymentService implements PaymentService {
                 .add("email", initiatePaymentRequestDto.getEmail())
                 .build();
 
+        System.out.println(appConfig.getPayStackInitiatePaymentUrl());
+
         Request request = new Request.Builder()
                 .url(appConfig.getPayStackInitiatePaymentUrl())
                 .header("Authorization", "Bearer " + appConfig.getPayStackSecretKey())
