@@ -258,7 +258,6 @@ public class FiddoveaCustomerServiceTest {
     updateCustomerRequest.setFirstName("Oladipupo");
     updateCustomerRequest.setLastName("Olamilekan");
     updateCustomerRequest.setPhoneNumber("08026188203");
-    updateCustomerRequest.setPassword("newPassword");
 
     updateCustomerRequest.setEmail("Oladipupoolamilekan2@gmail.com");
 
