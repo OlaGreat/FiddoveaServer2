@@ -126,7 +126,8 @@ public class FiddoveaCustomerService implements CustomerService {
 
 
 
-    public UpdateCustomerResponse updateProfile(UpdateCustomerRequest updateCustomerRequest, String userId) throws JsonPatchException {
+    public UpdateCustomerResponse updateProfile(UpdateCustomerRequest updateCustomerRequest, HttpServletRequest servletRequest) throws JsonPatchException {
+        String userId = tokenVerifier(servletRequest);
         Customer customer = findById(userId);
         ModelMapper modelMapper = new ModelMapper();
         JsonPatch updatePatch = buildUpdatePatch(updateCustomerRequest);

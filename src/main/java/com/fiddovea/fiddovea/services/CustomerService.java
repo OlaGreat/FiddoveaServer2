@@ -24,7 +24,7 @@ public interface CustomerService {
 
     Customer findById(String customerId);
 
-    UpdateCustomerResponse updateProfile(UpdateCustomerRequest updateCustomerRequest, String id) throws JsonPatchException;
+    UpdateCustomerResponse updateProfile(UpdateCustomerRequest updateCustomerRequest,HttpServletRequest servletRequest) throws JsonPatchException;
 
     WishListResponse addToWishList(String productId, HttpServletRequest servletRequest);
     List<Product> viewWishList(HttpServletRequest request);

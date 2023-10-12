@@ -39,9 +39,9 @@ public class CustomerServiceController {
     }
 
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<UpdateCustomerResponse>updateUserProfile(@ModelAttribute UpdateCustomerRequest updaterCustomerRequest, @PathVariable String id) throws JsonPatchException {
-        UpdateCustomerResponse response = customerService.updateProfile(updaterCustomerRequest, id);
+    @PutMapping("/update")
+    public ResponseEntity<UpdateCustomerResponse>updateUserProfile(@ModelAttribute UpdateCustomerRequest updaterCustomerRequest, HttpServletRequest servletRequest) throws JsonPatchException {
+        UpdateCustomerResponse response = customerService.updateProfile(updaterCustomerRequest, servletRequest);
         return ResponseEntity.ok(response);
     }
 

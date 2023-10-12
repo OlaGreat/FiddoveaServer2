@@ -18,15 +18,12 @@ public class AppConfig {
     @Value("${cloud.api.secret}")
     private String cloudSecret;
 
-    @Value("${payStack-secret-key}")
+    @Value("${PAYSTACK_KEY}")
     private String payStackSecretKey;
-    @Value("${payStack-initiate-payment-url}")
+    @Value("=${PAYSTACK_INITIATE_PAYMENT}")
     private String payStackInitiatePaymentUrl;
-    @Value("${payStack-verify-payment-url}")
+    @Value("${PAYSTACK_VERIFY_PAYMENT_URL}")
     private String payStackVerifyPaymentUrl;
-
-    @Value("${paystack.secret.key}")
-    private String paystackSecertKey;
 
 
     public String getPayStackSecretKey(){return payStackSecretKey;}

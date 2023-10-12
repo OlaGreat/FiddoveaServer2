@@ -108,8 +108,9 @@ public class FiddoveaCustomerServiceTest {
     @Test
     @Order(7)
     public void tesThatUserCanUpdateAccount() throws JsonPatchException {
+        HttpServletRequest request = buildHttpServletRequestForToken();
         UpdateCustomerRequest updateCustomerRequest = buildUpdateRequest();
-        UpdateCustomerResponse response = customerService.updateProfile(updateCustomerRequest, labTestCustomerId);
+        UpdateCustomerResponse response = customerService.updateProfile(updateCustomerRequest, request);
         assertThat(response).isNotNull();
         GetResponse customerResponse = customerService.getCustomerById(labTestCustomerId);
         String fullName = customerResponse.getFullName();
