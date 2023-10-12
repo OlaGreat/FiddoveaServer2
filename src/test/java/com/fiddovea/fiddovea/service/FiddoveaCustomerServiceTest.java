@@ -67,7 +67,7 @@ public class FiddoveaCustomerServiceTest {
     @Order(3)
     public void findATestProduct(){
         List<Product> productList = productService.getAllProduct();
-        Product testProduct = productList.get(0);
+        Product testProduct = productList.get(1);
         labTestProductId = testProduct.getProductId();
 
     }
@@ -87,8 +87,9 @@ public class FiddoveaCustomerServiceTest {
     public void testCustomerLogin(){
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setEmail("Oladipupoolamilekan2@gmail.com");
-        loginRequest.setPassword("Oladipupo");
+        loginRequest.setPassword("newPassword");
         LoginResponse response = customerService.login(loginRequest);
+        System.out.println(response);
         assertThat(response).isNotNull();
 
     }
@@ -237,6 +238,19 @@ public class FiddoveaCustomerServiceTest {
        List<Product> cart = customerService.viewCart(requestToken);
        assertThat(cart.size()).isEqualTo(0);
     }
+
+    @Test
+    @Order(20)
+    void testThatCustomerCanAddAddress(){
+        HttpServletRequest requestToken = buildHttpServletRequestForToken();
+        AddAddressRequest addAddressRequest = new AddAddressRequest();
+        addAddressRequest.setLga("Sabo");
+        addAddressRequest.setHouseNumber("7");
+        addAddressRequest.setState("Lagos");
+        addAddressRequest.setStreet("Yaba");
+        customerService.addAddress(addAddressRequest,requestToken);
+    }
+
 
     private UpdateCustomerRequest buildUpdateRequest() {
     UpdateCustomerRequest updateCustomerRequest = new UpdateCustomerRequest();

@@ -10,7 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import static com.fiddovea.fiddovea.dto.response.ResponseMessage.CHAT_NOT_FIND;
+import static com.fiddovea.fiddovea.dto.response.ResponseMessage.CHAT_NOT_FOUND;
 import static com.fiddovea.fiddovea.dto.response.ResponseMessage.MESSAGE_SENT;
 
 
@@ -35,7 +35,7 @@ public class FiddoveaChatServices implements ChatService{
         String content = sendMessageRequest.getContent();
 
         Chat foundChat = chatRepository.findById(chatId)
-                                       .orElseThrow(()-> new FiddoveaChatException(CHAT_NOT_FIND.name()));
+                                       .orElseThrow(()-> new FiddoveaChatException(CHAT_NOT_FOUND.name()));
         Message message = new Message();
         message.setContent(content);
         foundChat.getChatHistory().add(message);

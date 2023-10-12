@@ -429,6 +429,24 @@ public class FiddoveaCustomerService implements CustomerService {
         return customerRepository.findAll();
     }
 
+    @Override
+    public AddressResponse addAddress(AddAddressRequest addAddressRequest, HttpServletRequest servletRequest) {
+        String customerId = tokenVerifier(servletRequest);
+        Address address = Address.builder()
+                .houseNumber(addAddressRequest.getHouseNumber())
+                .state(addAddressRequest.getState())
+                .street(addAddressRequest.getStreet())
+                .lga(addAddressRequest.getLga())
+                .build();
+        Customer foundCustomer = findById(customerId);
+        foundCustomer.getAddressList().add(address);
+        customerRepository.save(foundCustomer);
+        AddressResponse addressResponse = new AddressResponse();
+        addressResponse.setMessage(ADDRESS_ADDED_SUCCESSFULLY.getMessage());
+
+        return addressResponse;
+    }
+
 
 //    @Override
 //    public List<Product> filterByPrice(double minPrice, double maxPrice) {
