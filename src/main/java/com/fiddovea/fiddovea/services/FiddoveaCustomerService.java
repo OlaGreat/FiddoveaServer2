@@ -128,6 +128,7 @@ public class FiddoveaCustomerService implements CustomerService {
 
     public UpdateCustomerResponse updateProfile(UpdateCustomerRequest updateCustomerRequest, HttpServletRequest servletRequest) throws JsonPatchException {
         String userId = tokenVerifier(servletRequest);
+        System.out.println("___----------------->" + userId);
         Customer customer = findById(userId);
         ModelMapper modelMapper = new ModelMapper();
         JsonPatch updatePatch = buildUpdatePatch(updateCustomerRequest);
@@ -199,7 +200,10 @@ public class FiddoveaCustomerService implements CustomerService {
         customer.setEmail(email);
         //4. Save updatedUser from step 3 in the DB
         var savedUser= customerRepository.save(customer);
-        return new UpdateCustomerResponse(PROFILE_UPDATE_SUCCESSFUL.name());
+        UpdateCustomerResponse updateCustomerResponse = new UpdateCustomerResponse();
+        updateCustomerResponse.setMessage(PROFILE_UPDATE_SUCCESSFUL.getMessage());
+        BeanUtils.copyProperties(savedUser, updateCustomerResponse);
+        return updateCustomerResponse;
 
     }
 

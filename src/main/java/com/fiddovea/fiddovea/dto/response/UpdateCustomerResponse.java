@@ -11,6 +11,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateCustomerResponse {
-
     private String message;
+    private String lastName;
+    private String firstName;
+    private String email;
+    private String phoneNumber;
+
 }

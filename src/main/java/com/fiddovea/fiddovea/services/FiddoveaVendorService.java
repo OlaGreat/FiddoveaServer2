@@ -201,7 +201,10 @@ public class FiddoveaVendorService implements VendorService {
         //4. Save updatedUser from step 3 in the DB
         var savedUser= vendorRepository.save(vendor);
 
-        return new UpdateVendorResponse(PROFILE_UPDATE_SUCCESSFUL.name());
+        UpdateVendorResponse updateVendorResponse = new UpdateVendorResponse();
+        updateVendorResponse.setMessage(PROFILE_UPDATE_SUCCESSFUL.name());
+        BeanUtils.copyProperties(savedUser, updateVendorResponse);
+        return updateVendorResponse;
 
     }
 

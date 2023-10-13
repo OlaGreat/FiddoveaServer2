@@ -13,4 +13,12 @@ import lombok.Setter;
 public class UpdateVendorResponse {
 
     private String message;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String password;
+    private String  companyRcNumber;
+    private String companyPhoneNumber;
+    private String businessType;
+
 }
